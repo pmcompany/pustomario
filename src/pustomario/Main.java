@@ -68,6 +68,7 @@ public class Main {
             updateGraphics();
 
             Display.update();
+			Display.sync(60);
         }
 
         Display.destroy();
