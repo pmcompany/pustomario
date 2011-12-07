@@ -2,14 +2,12 @@ package pustomario;
 
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.Display;
-import org.lwjgl.util.Color;
-import org.lwjgl.util.ReadableColor;
+import org.newdawn.slick.Color;
 
 import java.io.*;
-
-import static org.lwjgl.opengl.GL11.*;
 
 /**
  * @author dector
@@ -43,6 +41,8 @@ public class Main {
     private boolean goRight = true;
 
     private GLDrawer drawer;
+
+    private static final PColor MOUSE_COLOR = PColor.RED;
     private static final PColor WALL_COLOR = PColor.BLACK;
     private static final PColor HERO_COLOR = PColor.RED;
     private static final PColor EYE_COLOR = PColor.BLACK;
@@ -58,6 +58,9 @@ public class Main {
 
     private int startScreenX;
     private int startScreenY;
+
+    private int mouseX = SCREEN_WIDTH/2;
+    private int mouseY = SCREEN_HEIGHT/2;
 
     public static void main(String[] args) {
         Main main = new Main();
@@ -154,6 +157,9 @@ public class Main {
         } else if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
             speedY = -1;
         }
+
+        mouseX = Mouse.getX();
+        mouseY = Mouse.getY();
     }
 
     private void updateGame() {
@@ -186,7 +192,7 @@ public class Main {
     }
 
     private int getDirectionSpace(int direction) {
-        int playerTileX = relativeXToTile((int)playerXf);
+        int playerTileX = relativeXToTile((int) playerXf);
         int playerTileXn = relativeXToTile((int)playerXf, true);
         int playerTileY = relativeYToTile((int)playerYf);
         int playerTileYn = relativeYToTile((int)playerYf, true);
@@ -201,7 +207,7 @@ public class Main {
     }
 
     private int getRightSpace(int x0, int y0, int x1, int y1) {
-        int rightSpace = countRightSpace((int)playerXf);
+        int rightSpace = countRightSpace((int) playerXf);
 
         boolean end = false;
         while (! end) {
@@ -332,7 +338,21 @@ public class Main {
             }
         }
 
-        drawHero((int)(playerXf - startScreenX), (int)(playerYf - startScreenY));
+        drawHero((int) (playerXf - startScreenX), (int) (playerYf - startScreenY));
+
+        drawer.drawString(10, 10, String.format("Mouse %d:%d", mouseX, mouseY), Color.red);
+        drawer.drawString(10, 30, String.format("Player %d:%d", (int) playerXf, (int) playerYf), Color.red);
+        drawer.drawString(10, 50, String.format("Spaces L%d  R%d  T%d  B%d", getDirectionSpace(7),
+                getDirectionSpace(3), getDirectionSpace(1), getDirectionSpace(5)), Color.red);
+
+        drawMouse();
+    }
+
+    private void drawMouse() {
+        int length = 5;
+
+        drawer.drawLine(mouseX - length, mouseY + length, mouseX + length, mouseY - length, MOUSE_COLOR);
+        drawer.drawLine(mouseX - length, mouseY - length, mouseX + length, mouseY + length, MOUSE_COLOR);
     }
 
     public void drawWall(int x, int y) {
@@ -365,7 +385,7 @@ public class Main {
         if (speedX > 0 && canMove(3)) {
             playerXf += Math.min(speedX*SPEED_SCALE, getDirectionSpace(3));
         } else if (speedX < 0 && canMove(7)) {
-            playerXf -= Math.min(Math.abs(speedX*SPEED_SCALE), getDirectionSpace(7));
+            playerXf -= Math.min(Math.abs(speedX * SPEED_SCALE), getDirectionSpace(7));
         } else {
             speedX = 0;
         }
@@ -373,7 +393,7 @@ public class Main {
         if (speedY > 0 && canMove(1)) {
             playerYf += Math.min(speedY*SPEED_SCALE, getDirectionSpace(1));
         } else if (speedY < 0 && canMove(5)) {
-            playerYf -= Math.min(Math.abs(speedY*SPEED_SCALE), getDirectionSpace(5));
+            playerYf -= Math.min(Math.abs(speedY * SPEED_SCALE), getDirectionSpace(5));
         } else {
             speedY = 0;
         }
