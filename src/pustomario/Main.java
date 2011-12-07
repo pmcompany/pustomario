@@ -4,6 +4,8 @@ import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.DisplayMode;
 import org.lwjgl.opengl.Display;
+import org.lwjgl.util.Color;
+import org.lwjgl.util.ReadableColor;
 
 import java.io.*;
 
@@ -39,6 +41,12 @@ public class Main {
     private float playerYf;
 
     private boolean goRight = true;
+
+    private GLDrawer drawer;
+    private static final PColor WALL_COLOR = PColor.BLACK;
+    private static final PColor HERO_COLOR = PColor.RED;
+    private static final PColor EYE_COLOR = PColor.BLACK;
+    private static final PColor BACKGROUND_COLOR = new PColor(0.3f, 0.3f, 0.3f, 0.3f);
 
 //    private boolean[] canMove;
 //    private boolean isInJump;
@@ -93,12 +101,7 @@ public class Main {
     }
 
     private void initGL() {
-        glClearColor(0.3f, 0.3f, 0.3f, 0f);
-
-        glMatrixMode(GL_PROJECTION);
-        glLoadIdentity();
-        glOrtho(0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 1, -1);
-        glMatrixMode(GL_MODELVIEW);
+        drawer = new GLDrawer(SCREEN_WIDTH, SCREEN_HEIGHT, BACKGROUND_COLOR);
     }
 
     private void initGame() {
@@ -151,22 +154,6 @@ public class Main {
         } else if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
             speedY = -1;
         }
-
-//        if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
-//            jump(true);
-//        } else {
-//            jump(false);
-//        }
-//        while(Keyboard.next()) {
-//            if (Keyboard.getEventKeyState()) {
-//                if (Keyboard.getEventKey() == Keyboard.KEY_UP) {
-//                    jump();
-//                }
-//            }
-//        }
-//        else if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
-//            moveHero(5);
-//        }
     }
 
     private void updateGame() {
@@ -195,31 +182,6 @@ public class Main {
     }
 
     private boolean canMove(int direction) {
-//
-//        int leftSpace = countLeftSpace((int)playerXf);
-//        int rightSpace = countRightSpace((int)playerXf);
-//        int topSpace = countTopSpace((int)playerYf);
-//        int bottomSpace = countBottomSpace((int)playerYf);
-//
-//        if (level[playerTileX][playerTileY] == 0 && level[playerTileX][playerTileYn] == 0
-//                && level[playerTileXn][playerTileY] == 0 && level[playerTileXn][playerTileYn] == 0) {
-//            switch (direction) {
-//                case 1: canMove = (topSpace > 0 || level[playerTileX][playerTileY+1] == 0 && level[playerTileXn][playerTileY+1] == 0); break;
-//                case 3: canMove = (rightSpace > 0 || level[playerTileX+1][playerTileY] == 0 && level[playerTileX+1][playerTileYn] == 0); break;
-//                case 5: canMove = (bottomSpace > 0 || level[playerTileX][playerTileY-1] == 0 && level[playerTileXn][playerTileY-1] == 0); break;
-////                case 6: canMove = (bottomSpace > 0 && rightSpace > 0 || level[playerTileX-1][playerTileY] == 0
-////                        && level[playerTileX][playerTileY-1] == 0); break;
-//                case 7: canMove = (leftSpace > 0 || level[playerTileX-1][playerTileY] == 0 && level[playerTileX-1][playerTileYn] == 0); break;
-//            }
-//        } else {
-//            switch (direction) {
-//                case 1: playerYf -= TILE_HEIGHT - topSpace;
-//                case 3: playerXf -= TILE_WIDTH - rightSpace;
-//                case 5: playerYf += TILE_HEIGHT - bottomSpace;
-//                case 7: playerXf += TILE_WIDTH - leftSpace;
-//            }
-//        }
-
         return getDirectionSpace(direction) > 0;
     }
 
@@ -351,7 +313,7 @@ public class Main {
     }
 
     private void updateGraphics() {
-        glClear(GL_COLOR_BUFFER_BIT);
+        drawer.update();
 
         int startTileX = relativeXToTile(startScreenX);
         int endTileX = Math.min(startTileX + HORISONTAL_SCROLL_BORDER, levelWidth);
@@ -364,7 +326,6 @@ public class Main {
                 tile = level[x][y];
                 if (tile != 0) {
                     if (tile == '#') {
-//                        drawWall(x - startTileX, y - startTileY);
                         drawWall(tileXToRelative(x) - startScreenX, tileYToRelative(y) - startScreenY);
                     }
                 }
@@ -375,30 +336,17 @@ public class Main {
     }
 
     public void drawWall(int x, int y) {
-        glColor3f(0f, 0f, 0f);
-
         int tileX = TILE_WIDTH * relativeXToTile(x);
         int tileY = TILE_HEIGHT * relativeYToTile(y);
 
         int x0 = x % TILE_WIDTH;
         int y0 = y % TILE_HEIGHT;
 
-        glBegin(GL_QUADS);
-        glVertex2i(x0 + tileX, y0 + SCREEN_HEIGHT - tileY);
-        glVertex2i(x0 + tileX, y0 + SCREEN_HEIGHT - tileY - TILE_HEIGHT);
-        glVertex2i(x0 + tileX + TILE_WIDTH, y0 + SCREEN_HEIGHT - tileY - TILE_HEIGHT);
-        glVertex2i(x0 + tileX + TILE_WIDTH, y0 + SCREEN_HEIGHT - tileY);
-        glEnd();
+        drawer.drawRect(x0 + tileX, y0 + tileY, TILE_WIDTH, TILE_HEIGHT, WALL_COLOR);
     }
 
     public void drawHero(int x, int y) {
-        glColor3f(1.0f, 0f, 0f);
-        glBegin(GL_QUADS);
-        glVertex2i(x, SCREEN_HEIGHT - y);
-        glVertex2i(x, SCREEN_HEIGHT - (y + TILE_HEIGHT));
-        glVertex2i(x + TILE_WIDTH, SCREEN_HEIGHT - (y + TILE_HEIGHT));
-        glVertex2i(x + TILE_WIDTH, SCREEN_HEIGHT - y);
-        glEnd();
+        drawer.drawRect(x, y, TILE_WIDTH, TILE_HEIGHT, HERO_COLOR);
 
         int eyeX;
         int eyeY = y + (int)((float)5/8 * TILE_HEIGHT);
@@ -410,16 +358,7 @@ public class Main {
             eyeX = x + (int)((float)1/8 * TILE_WIDTH);
         }
 
-        glColor3f(0f, 0f, 0f);
-        glBegin(GL_QUADS);
-        glVertex2i(eyeX, SCREEN_HEIGHT - eyeY);
-        glVertex2i(eyeX, SCREEN_HEIGHT - (eyeY + eyeH));
-        glVertex2i(eyeX + eyeW, SCREEN_HEIGHT - (eyeY + eyeH));
-        glVertex2i(eyeX + eyeW, SCREEN_HEIGHT - eyeY);
-        glEnd();
-
-//        System.out.println("Player: " + x + " " + y);
-//        System.out.println("Eye: " + eyeX + " " + eyeY + " " + eyeW + " " + eyeH);
+        drawer.drawRect(eyeX, eyeY, eyeW, eyeH, EYE_COLOR);
     }
 
     public void moveHero() {

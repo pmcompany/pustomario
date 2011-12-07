@@ -3,7 +3,9 @@
     <CLASSES>
       <root url="jar://$PROJECT_DIR$/lib/slick-util.jar!/" />
     </CLASSES>
-    <JAVADOC />
+    <JAVADOC>
+      <root url="http://lwjgl.org/javadoc/" />
+    </JAVADOC>
     <SOURCES />
   </library>
 </component>
