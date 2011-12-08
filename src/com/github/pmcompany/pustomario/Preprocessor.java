@@ -9,9 +9,6 @@ import com.github.pmcompany.pustomario.io.InputHandler;
  * @author dector (dector9@gmail.com)
  */
 public class Preprocessor implements EventServer, InputHandler {
-
-
-
     public void addEventHandler(EventHandler handler) {
     }
 
