@@ -25,14 +25,15 @@ public class Client implements Runnable, GameManager, OutputServer {
         // Create components
         game = new ConcreteGame();
         lwjgl = new LWJGLComplex(this, game, SCREEN_WIDTH, SCREEN_HEIGHT);
-        preprocessor = new Preprocessor();
+//        preprocessor = new Preprocessor();
 
         // Configure components
         lwjgl.setTitle(GAME_TITLE);
 
         // Link components
         lwjgl.addInputHandler(preprocessor);
-        preprocessor.addEventHandler(game);
+        lwjgl.addEventHandler(game);
+//        preprocessor.addEventHandler(game);
 
         // Managed states initial value
         turnOff = false;

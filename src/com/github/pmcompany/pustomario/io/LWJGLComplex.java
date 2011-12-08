@@ -1,8 +1,6 @@
 package com.github.pmcompany.pustomario.io;
 
-import com.github.pmcompany.pustomario.core.DataProvider;
-import com.github.pmcompany.pustomario.core.GameManager;
-import com.github.pmcompany.pustomario.core.GameManagerUser;
+import com.github.pmcompany.pustomario.core.*;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.opengl.Display;
@@ -14,8 +12,8 @@ import java.util.List;
 /**
  * @author dector (dector9@gmail.com)
  */
-public class LWJGLComplex implements InputServer, OutputHandler, GameManagerUser {
-    private List<InputHandler> handlers;
+public class LWJGLComplex implements EventServer, InputServer, OutputHandler, GameManagerUser {
+    private List<EventHandler> handlers;
     private GameManager gmanager;
 
     private GLDrawer drawer;
@@ -39,22 +37,28 @@ public class LWJGLComplex implements InputServer, OutputHandler, GameManagerUser
         view = new View();
         this.game = game;
 
-        handlers = new LinkedList<InputHandler>();
+        handlers = new LinkedList<EventHandler>();
     }
 
-    public void addInputHandler(InputHandler handler) {
-        if (! handlers.contains(handler)) {
-            handlers.add(handler);
+    public void addInputHandler(InputHandler handler) {}
+
+    public void removeInputHandler(InputHandler handler) {}
+
+    public void checkInput() {
+        if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
+            sendEvent(new GameEvent(EventType.ACCELERATE_PLAYER, 3.2f));
+        } else if (Keyboard.isKeyDown(Keyboard.KEY_LEFT)) {
+            sendEvent(new GameEvent(EventType.ACCELERATE_PLAYER, -3.2f));
+        }
+
+        if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
+            gmanager.turnOffGame();
         }
     }
 
-    public void removeInputHandler(InputHandler handler) {
-        handlers.remove(handler);
-    }
-
-    public void checkInput() {
-        if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
-            gmanager.turnOffGame();
+    private void sendEvent(GameEvent event) {
+        for (EventHandler h : handlers) {
+            h.handleEvent(event);
         }
     }
 
@@ -122,16 +126,26 @@ public class LWJGLComplex implements InputServer, OutputHandler, GameManagerUser
                 View.TILE_WIDTH, View.TILE_HEIGHT, View.HERO_COLOR);
 
         int eyeX = px;
-        int eyeY = py + (int)(25f/40 * View.TILE_YRADIUS);
+        int eyeY = py + (int)(0.25f * View.TILE_YRADIUS);
         int eyeW = (int)(1f/2 * View.TILE_XRADIUS);
         int eyeH = (int)(1f/2 * View.TILE_YRADIUS);
 
-        if (game.isPlayerWatchingRight()) {
-            eyeX += (int)(0.25 * View.TILE_XRADIUS);
-        } else {
-            eyeX -= (int)(0.25 * View.TILE_XRADIUS);
-        }
+//        if (game.isPlayerWatchingRight()) {
+//            eyeX += (int)(0.25 * View.TILE_XRADIUS);
+//        } else {
+//            eyeX -= (int)(0.25 * View.TILE_XRADIUS);
+//        }
 
         drawer.drawRect(eyeX, eyeY, eyeW, eyeH, View.EYE_COLOR);
+    }
+
+    public void addEventHandler(EventHandler handler) {
+        if (! handlers.contains(handler)) {
+            handlers.add(handler);
+        }
+    }
+
+    public void removeEventHandler(EventHandler handler) {
+        handlers.remove(handler);
     }
 }

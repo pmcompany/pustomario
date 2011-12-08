@@ -7,6 +7,9 @@ public class Player {
     private int x;
     private int y;
 
+    private float speedX;
+    private float speedY;
+
     private boolean watchingRight;
 
     public Player(int x, int y) {
@@ -34,5 +37,33 @@ public class Player {
 
     public boolean isWatchingRight() {
         return watchingRight;
+    }
+
+    public float getSpeedX() {
+        return speedX;
+    }
+
+    public void setSpeedX(float speedX) {
+        this.speedX = speedX;
+    }
+
+    public float getSpeedY() {
+        return speedY;
+    }
+
+    public void setSpeedY(float speedY) {
+        this.speedY = speedY;
+    }
+
+    public void accelerateX(float accelerationX) {
+        speedX += accelerationX;
+
+        if (accelerationX != 0) {
+            if (accelerationX > 0) {
+                watchingRight = true;
+            } else if (accelerationX <0) {
+                watchingRight = false;
+            }
+        }
     }
 }

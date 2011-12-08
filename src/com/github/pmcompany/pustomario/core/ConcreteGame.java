@@ -57,6 +57,13 @@ public class ConcreteGame implements EventHandler, DataProvider {
     }
 
     public void handleEvent(Event e) {
+        switch (e.getType()) {
+            case ACCELERATE_PLAYER: {
+                player.accelerateX(e.getFloatValue() * Physics.RUN_ACCELERATION_COEFFICIENT);
+                player.setX(player.getX() + (int)player.getSpeedX());
+                player.setSpeedX(0);
+            } break;
+        }
     }
 
     public int getTileAt(int x, int y) {
