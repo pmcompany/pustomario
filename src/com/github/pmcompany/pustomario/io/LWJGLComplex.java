@@ -1,5 +1,6 @@
 package com.github.pmcompany.pustomario.io;
 
+import com.github.pmcompany.pustomario.core.DataProvider;
 import com.github.pmcompany.pustomario.core.GameManager;
 import com.github.pmcompany.pustomario.core.GameManagerUser;
 import org.lwjgl.LWJGLException;
@@ -18,8 +19,11 @@ public class LWJGLComplex implements InputServer, OutputHandler, GameManagerUser
     private GameManager gmanager;
 
     private GLDrawer drawer;
+    private DataProvider game;
 
-    public LWJGLComplex(GameManager gmanager, int screenWidth, int screenHeight) {
+    private View view;
+
+    public LWJGLComplex(GameManager gmanager, DataProvider game, int screenWidth, int screenHeight) {
         this.gmanager = gmanager;
 
         try {
@@ -31,6 +35,9 @@ public class LWJGLComplex implements InputServer, OutputHandler, GameManagerUser
         }
 
         drawer = new GLDrawer(screenWidth, screenHeight);
+        drawer.setClearColor(View.BACK_COLOR);
+        view = new View();
+        this.game = game;
 
         handlers = new LinkedList<InputHandler>();
     }
@@ -54,6 +61,8 @@ public class LWJGLComplex implements InputServer, OutputHandler, GameManagerUser
     public void handleOutput() {
         drawer.update();
 
+        drawMap();
+
         Display.update();
     }
 
@@ -71,5 +80,36 @@ public class LWJGLComplex implements InputServer, OutputHandler, GameManagerUser
 
     public boolean isCloseRequested() {
         return Display.isCloseRequested();
+    }
+
+    private void drawMap() {
+//        int startTileX = view.getTileX(view.getLeftX());
+//        int startTileY = view.getTileY(view.getLeftY());
+//
+//        char tile;
+//        for (int x = startTileX; x < endTileX; x++) {
+//            for (int y = startTileY; y < endTileY; y++) {
+//                tile = [x][y];
+//                if (tile != 0) {
+//                    if (tile == '#') {
+//                        drawWall(tileXToRelative(x) - startScreenX, tileYToRelative(y) - startScreenY);
+//                    }
+//                }
+//            }
+//        }
+
+        int tile;
+        for (int x = 0; x < game.getMapWidth(); x++) {
+            for (int y = 0; y < game.getMapHeight(); y++) {
+                tile = game.getTileAt(x, y);
+
+                if (tile != 0) {
+                    if (tile == '#') {
+                        drawer.drawRect(x * View.TILE_WIDTH, y * View.TILE_HEIGHT,
+                                View.TILE_WIDTH, View.TILE_HEIGHT, View.WALL_COLOR);
+                    }
+                }
+            }
+        }
     }
 }

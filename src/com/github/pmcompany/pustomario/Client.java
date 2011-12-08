@@ -23,9 +23,9 @@ public class Client implements Runnable, GameManager, OutputServer {
 
     public Client() {
         // Create components
-        lwjgl = new LWJGLComplex(this, SCREEN_WIDTH, SCREEN_HEIGHT);
-        preprocessor = new Preprocessor();
         game = new ConcreteGame();
+        lwjgl = new LWJGLComplex(this, game, SCREEN_WIDTH, SCREEN_HEIGHT);
+        preprocessor = new Preprocessor();
 
         // Configure components
         lwjgl.setTitle(GAME_TITLE);
@@ -39,6 +39,8 @@ public class Client implements Runnable, GameManager, OutputServer {
     }
 
     public void run() {
+        game.initGame();
+
         while (! (turnOff || lwjgl.isCloseRequested())) {
             lwjgl.checkInput();
             lwjgl.handleOutput();

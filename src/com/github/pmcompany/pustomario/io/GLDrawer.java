@@ -7,7 +7,6 @@ package com.github.pmcompany.pustomario.io;
 import org.lwjgl.input.Mouse;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Font;
-import pustomario.PColor;
 
 import static org.lwjgl.opengl.GL11.*;
 
@@ -24,13 +23,13 @@ public class GLDrawer {
 
         initGL();
 
-        Mouse.setGrabbed(true);
+//        Mouse.setGrabbed(true);
     }
 
     public void initGL() {
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-        glClearColor(clearColor.getRed(), clearColor.getGreen(), clearColor.getBlue(), clearColor.getAlpha());
+        updateClearColor();
 
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
@@ -70,8 +69,13 @@ public class GLDrawer {
         glClear(GL_COLOR_BUFFER_BIT);
     }
 
+    private void updateClearColor() {
+        glClearColor(clearColor.getRed(), clearColor.getGreen(), clearColor.getBlue(), clearColor.getAlpha());
+    }
+
     public void setClearColor(PColor clearColor) {
         this.clearColor = clearColor;
+        updateClearColor();
     }
 }
 
