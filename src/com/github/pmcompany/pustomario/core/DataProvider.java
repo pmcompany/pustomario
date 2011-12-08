@@ -8,6 +8,7 @@ public interface DataProvider {
 
     public int getPlayerX();
     public int getPlayerY();
+    public boolean isPlayerWatchingRight();
 
     public int getMapWidth();
     public int getMapHeight();

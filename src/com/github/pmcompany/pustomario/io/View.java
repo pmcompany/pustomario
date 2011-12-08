@@ -6,10 +6,13 @@ package com.github.pmcompany.pustomario.io;
 public class View {
     public static final int TILE_WIDTH = 16;
     public static final int TILE_HEIGHT = 16;
+    public static final int TILE_XRADIUS = TILE_WIDTH/2;
+    public static final int TILE_YRADIUS = TILE_HEIGHT/2;
 
     public static final PColor WALL_COLOR = PColor.BLACK;
+    public static final PColor HERO_COLOR = PColor.RED;
+    public static final PColor EYE_COLOR = PColor.BLACK;
     public static final PColor BACK_COLOR = new PColor(0.3f, 0.3f, 0.3f, 0.3f);
-
     private int leftX;
     private int leftY;
 

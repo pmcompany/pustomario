@@ -62,6 +62,7 @@ public class LWJGLComplex implements InputServer, OutputHandler, GameManagerUser
         drawer.update();
 
         drawMap();
+        drawPlayer();
 
         Display.update();
     }
@@ -111,5 +112,26 @@ public class LWJGLComplex implements InputServer, OutputHandler, GameManagerUser
                 }
             }
         }
+    }
+
+    private void drawPlayer() {
+        int px = game.getPlayerX();
+        int py = game.getPlayerY();
+
+        drawer.drawRect(px - View.TILE_XRADIUS, py - View.TILE_YRADIUS,
+                View.TILE_WIDTH, View.TILE_HEIGHT, View.HERO_COLOR);
+
+        int eyeX = px;
+        int eyeY = py + (int)(25f/40 * View.TILE_YRADIUS);
+        int eyeW = (int)(1f/2 * View.TILE_XRADIUS);
+        int eyeH = (int)(1f/2 * View.TILE_YRADIUS);
+
+        if (game.isPlayerWatchingRight()) {
+            eyeX += (int)(0.25 * View.TILE_XRADIUS);
+        } else {
+            eyeX -= (int)(0.25 * View.TILE_XRADIUS);
+        }
+
+        drawer.drawRect(eyeX, eyeY, eyeW, eyeH, View.EYE_COLOR);
     }
 }

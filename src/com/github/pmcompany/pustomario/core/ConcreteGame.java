@@ -1,5 +1,7 @@
 package com.github.pmcompany.pustomario.core;
 
+import com.github.pmcompany.pustomario.io.View;
+
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -10,6 +12,7 @@ import java.io.IOException;
  */
 public class ConcreteGame implements EventHandler, DataProvider {
     private Map map;
+    private Player player;
 
     public ConcreteGame() {
     }
@@ -37,8 +40,8 @@ public class ConcreteGame implements EventHandler, DataProvider {
                     if (tile == '#') {
                         map.setAt(i, j, levelLine.charAt(i));
                     } else if (tile == '@') {
-//                        playerXf = TILE_WIDTH * i;
-//                        playerYf = TILE_HEIGHT * j;
+                        player = new Player(i * View.TILE_WIDTH + View.TILE_XRADIUS,
+                                j * View.TILE_HEIGHT + View.TILE_YRADIUS);
                     }
                 }
             }
@@ -46,6 +49,10 @@ public class ConcreteGame implements EventHandler, DataProvider {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+
+        if (player == null) {
+            player = new Player(1, 1);
         }
     }
 
@@ -57,11 +64,11 @@ public class ConcreteGame implements EventHandler, DataProvider {
     }
 
     public int getPlayerX() {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        return player.getX();
     }
 
     public int getPlayerY() {
-        return 0;  //To change body of implemented methods use File | Settings | File Templates.
+        return player.getY();
     }
 
     public int getMapWidth() {
@@ -70,5 +77,9 @@ public class ConcreteGame implements EventHandler, DataProvider {
 
     public int getMapHeight() {
         return map.getHeight();
+    }
+
+    public boolean isPlayerWatchingRight() {
+        return player.isWatchingRight();
     }
 }
