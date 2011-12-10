@@ -61,11 +61,15 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
             sendEvent(new GameEvent(EventType.ACCELERATE_X_PLAYER, 3.2f));
         } else if (Keyboard.isKeyDown(Keyboard.KEY_LEFT)) {
             sendEvent(new GameEvent(EventType.ACCELERATE_X_PLAYER, -3.2f));
-        } else if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
+        }
+
+        if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
             sendEvent(new GameEvent(EventType.ACCELERATE_Y_PLAYER, 3.2f));
         } else if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
             sendEvent(new GameEvent(EventType.ACCELERATE_Y_PLAYER, -3.2f));
-        } else if (Keyboard.next()) {
+        }
+
+        if (Keyboard.next()) {
             if (Keyboard.getEventKeyState()) {
                 switch (Keyboard.getEventKey()) {
                     case Keyboard.KEY_D: gmanager.switchDebugMode(); break;
@@ -168,11 +172,31 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
                 tileP = crossedTiles.get(i);
                 absTileStartP = game.countAbsByTile(tileP.getX(), tileP.getY());
 
-                drawer.drawString(10, 30 + i * 20, String.format("%d rect: %d:%d", i + 1, absTileStartP.getX(), absTileStartP.getY()), textFont, Color.red);
+//                drawer.drawString(10, 30 + i * 20, String.format("%d rect: %d:%d", i + 1, absTileStartP.getX(), absTileStartP.getY()), textFont, Color.red);
                 drawer.drawRect(absTileStartP.getX() - 1, absTileStartP.getY() - 1, View.TILE_WIDTH-1, View.TILE_HEIGHT-1, PColor.BLUE);
             }
 
-            List<Point> neighTiles = game.getPlayerNeighbourTiles();
+            int direction = 0;
+
+            float speedX = game.getPlayerSpeedX();
+            if (speedX != 0) {
+                if (speedX > 0) {
+                    direction |= VectorDirection.RIGHT;
+                } else {
+                    direction |= VectorDirection.LEFT;
+                }
+            }
+
+            float speedY = game.getPlayerSpeedY();
+            if (speedY != 0) {
+                if (speedY > 0) {
+                    direction |= VectorDirection.UP;
+                } else {
+                    direction |= VectorDirection.DOWN;
+                }
+            }
+
+            List<Point> neighTiles = game.getPlayerNeighbourTiles(direction);
             for (Point neighTile : neighTiles) {
                 absTileStartP = game.countAbsByTile(neighTile.getX(), neighTile.getY());
 
@@ -184,6 +208,7 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
             }
 
             drawer.drawString(10, 10, String.format("Player pos: %d:%d", px, py), textFont, Color.red);
+            drawer.drawString(10, 30, String.format("Vx: %.3f\t\t Vy:%.3f", speedX, speedY), textFont, Color.red);
 
         }
         // DEBUG END
@@ -199,9 +224,5 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
 
     public void removeEventHandler(EventHandler handler) {
         handlers.remove(handler);
-    }
-
-    public void updateGame() {
-        game.update();
     }
 }

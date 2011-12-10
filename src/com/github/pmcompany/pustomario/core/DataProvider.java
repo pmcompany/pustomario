@@ -14,13 +14,13 @@ public interface DataProvider {
 
     public int getPlayerX();
     public int getPlayerY();
+    public float getPlayerSpeedX();
+    public float getPlayerSpeedY();
     public boolean isPlayerWatchingRight();
 
     public List<Point> getPlayerCrossedTiles();
-    public List<Point> getPlayerNeighbourTiles();
+    public List<Point> getPlayerNeighbourTiles(int direction);
 
     public int getMapWidth();
     public int getMapHeight();
-
-    public void update();
 }

@@ -1,8 +1,6 @@
 package com.github.pmcompany.pustomario.core;
 
-import com.github.pmcompany.pustomario.io.PColor;
 import com.github.pmcompany.pustomario.io.View;
-import org.newdawn.slick.Color;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
@@ -10,6 +8,8 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
+
+import static com.github.pmcompany.pustomario.core.VectorDirection.*;
 
 /**
  * @author dector (dector9@gmail.com)
@@ -99,6 +99,14 @@ public class ConcreteGame implements EventHandler, DataProvider {
         return player.getY();
     }
 
+    public float getPlayerSpeedX() {
+        return player.getSpeedX();
+    }
+
+    public float getPlayerSpeedY() {
+        return player.getSpeedY();
+    }
+
     public int getMapWidth() {
         return map.getWidth();
     }
@@ -111,7 +119,7 @@ public class ConcreteGame implements EventHandler, DataProvider {
         return player.isWatchingRight();
     }
 
-    public void update() {
+    public void preUpdate() {
         long currTime = System.currentTimeMillis();
         long diff = currTime - updateTime;
 
@@ -123,42 +131,95 @@ public class ConcreteGame implements EventHandler, DataProvider {
         updateTime = currTime;
     }
 
+    public void endUpdate() {
+        player.setSpeedX(0);
+        player.setSpeedY(0);
+    }
+
     private void movePlayer() {
         int px = player.getX();
         int py = player.getY();
         float speedX = player.getSpeedX();
         float speedY = player.getSpeedY();
 
-//        // Taske 4 point (which are in player coners)
-//        // Apply for each point SpeedX and SpeedY vector
+        // Get neightbour tiles for selected direction(speedX, speedY)
+        // Move player
+
+//        int direction = 0;
 //
-//        double speedSum = Math.sqrt(Math.pow(speedX, 2) + Math.pow(speedY, 2));
+//        if (speedX != 0) {
+//            if (speedX > 0) {
+//                direction |= VectorDirection.RIGHT;
+//            } else {
+//                direction |= VectorDirection.LEFT;
+//            }
+//        }
 //
+//        if (speedY != 0) {
+//            if (speedY > 0) {
+//                direction |= VectorDirection.UP;
+//            } else {
+//                direction |= VectorDirection.DOWN;
+//            }
+//        }
 //
+//        float minX = View.TILE_WIDTH;
+//        float minY = View.TILE_HEIGHT;
 //
-//        double cosFi = speedX / speedSum;
-//        double sinFi = speedY / speedSum;
+//        int nX;
+//        int nY;
+//        int dx;
+//        int dy;
+//        for (Point p : getPlayerNeighbourTiles(direction)) {
+//            nX = p.getX();
+//            nY = p.getY();
 //
-//        int step = Math.floor(View.TILE_WIDTH / );
+//            dx = nX - px;
+//            dy = nY - py;
 //
-//        // Test right-move with collisions
-//        // Get tiles, what player is on
-//
-//        int[][] playerTiles = getPlayerTiles();
-//
-//
-//        int dx = 0;
-//        if (speedX > 0) {
-//            for (int i = 0; i < speedX / View.TILE_WIDTH; ) {
-//
+//            if (isTileBlocked(nX, nY)) {
+//                minY = Math.min(minY, coun)
 //            }
 //        }
 
-        player.setX(px + (int)speedX);
-        player.setY(py + (int)speedY);
+        Point newPlayerPoint;
+        Point newCrossedTile;
+        List<Point> crossedTiles;
+        boolean crosses = false;
 
-        player.setSpeedX(0);
-        player.setSpeedY(0);
+        if (speedX != 0) {
+            player.setX(px + (int)speedX);
+            crossedTiles = getPlayerCrossedTiles();
+
+            for (int i = 0; i < crossedTiles.size() && (! crosses); i++) {
+                newCrossedTile = crossedTiles.get(i);
+
+                if (isTileBlocked(newCrossedTile.getX(), newCrossedTile.getY())) {
+                    crosses = true;
+                }
+            }
+
+            if (crosses) {
+                player.setX(px);
+            }
+        }
+
+        if (speedY != 0) {
+            player.setY(py + (int)speedY);
+            crossedTiles = getPlayerCrossedTiles();
+
+            for (int i = 0; i < crossedTiles.size() && (! crosses); i++) {
+                newCrossedTile = crossedTiles.get(i);
+
+                if (isTileBlocked(newCrossedTile.getX(), newCrossedTile.getY())) {
+                    crosses = true;
+                }
+            }
+
+            if (crosses) {
+                player.setY(py);
+            }
+        }
     }
 
     public List<Point> getPlayerCrossedTiles() {
@@ -203,13 +264,13 @@ public class ConcreteGame implements EventHandler, DataProvider {
     }
 
     /*
-     *    128  1   16
-     *       \ ^ /
+     *         1
+     *         ^
      *     8 < . > 2
-     *       / V \
-     *    64   4   32
+     *         V
+     *         4
      */
-    public List<Point> getPlayerNeighbourTiles() {
+    public List<Point> getPlayerNeighbourTiles(int direction) {
         List<Point> points = new LinkedList<Point>();
 
         List<Point> crossedTiles = getPlayerCrossedTiles();
@@ -217,23 +278,46 @@ public class ConcreteGame implements EventHandler, DataProvider {
         int lx;
         int ly;
 
-        int[] clx = new int[]{0, 1, 1, 1, 0, -1, -1, -1};
-        int[] cly = new int[]{1, 1, 0, -1, -1, -1, 0, 1};
-
         Point nP;
         Point crossedP;
         for (int i = 0; i < crossedTiles.size(); i++) {
             crossedP = crossedTiles.get(i);
 
-            for (int j = 0; j < 8; j++) {
-                lx = clx[j];
-                ly = cly[j];
+            int k = 0;
+            int directionMask;
+            for (int j = 0; j < 4; j++) {
 
-                nP = new Point(crossedP.getX() + lx, crossedP.getY() + ly);
+                directionMask = 0;
 
-                if (! crossedTiles.contains(nP)) {
-                    points.add(nP);
+                if (direction != 0) {
+                    if ((direction & UP) != 0) {
+                        ly = 1;
+                        directionMask |= UP;
+                    } else if ((direction & DOWN) != 0) {
+                        ly = -1;
+                        directionMask |= DOWN;
+                    } else {
+                        ly = 0;
+                    }
+
+                    if ((direction & RIGHT) != 0) {
+                        lx = 1;
+                        directionMask |= RIGHT;
+                    } else if ((direction & LEFT) != 0) {
+                        lx = -1;
+                        directionMask |= LEFT;
+                    } else {
+                        lx = 0;
+                    }
+
+                    nP = new Point(crossedP.getX() + lx, crossedP.getY() + ly);
+
+                    if (! crossedTiles.contains(nP) && ! points.contains(nP)) {
+                        points.add(nP);
+                    }
                 }
+
+                k++;
             }
         }
 
