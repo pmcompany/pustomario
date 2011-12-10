@@ -1,11 +1,15 @@
 package com.github.pmcompany.pustomario.core;
 
+import com.github.pmcompany.pustomario.io.PColor;
 import com.github.pmcompany.pustomario.io.View;
+import org.newdawn.slick.Color;
 
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * @author dector (dector9@gmail.com)
@@ -147,6 +151,47 @@ public class ConcreteGame implements EventHandler, DataProvider {
 
         player.setSpeedX(0);
         player.setSpeedY(0);
+    }
+
+    public List<Point> getPlayerCrossedTiles() {
+        List<Point> tilesList = new LinkedList<Point>();
+
+        int px = player.getX();
+        int py = player.getY();
+
+        int lx = 0;
+        int ly = 0;
+        int nx;
+        int ny;
+        int dx;
+        int dy;
+        Point p;
+        for (int i = 0; i < 4; i++) {
+            nx = px + lx * (View.TILE_WIDTH - 1);
+            ny = py + ly * (View.TILE_HEIGHT - 1);
+
+            dx = nx % View.TILE_WIDTH;
+            dy = ny % View.TILE_HEIGHT;
+
+            nx -= ((dx != 0)?dx:View.TILE_WIDTH) - 1;
+            ny -= ((dy != 0)?dy:View.TILE_HEIGHT) - 1;
+
+            p = new Point(nx, ny);
+
+            if (! tilesList.contains(p)) {
+                tilesList.add(p);
+            }
+
+            if (i == 1) {
+                lx = 1;
+            } else if (i == 0) {
+                ly = 1;
+            } else if (i == 2) {
+                ly = 0;
+            }
+        }
+
+        return tilesList;
     }
 
 //    private int[][] getPlayerTiles() {

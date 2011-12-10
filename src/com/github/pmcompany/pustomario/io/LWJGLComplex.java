@@ -159,34 +159,14 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
 
         // DEBUG BEGIN
         if (gmanager.isDebugMode()) {
-            int lx = 0;
-            int ly = 0;
-            int nx;
-            int ny;
-            int dx;
-            int dy;
 
-            for (int i = 0; i < 4; i++) {
-                nx = px + lx * (View.TILE_WIDTH - 1);
-                ny = py + ly * (View.TILE_HEIGHT - 1);
+            Point p;
+            List<Point> crossedPoints = game.getPlayerCrossedTiles();
+            for (int i = 0; i < crossedPoints.size(); i++) {
+                p = crossedPoints.get(i);
 
-                dx = nx % View.TILE_WIDTH;
-                dy = ny % View.TILE_HEIGHT;
-
-                nx -= ((dx != 0)?dx:View.TILE_WIDTH) - 1;
-                ny -= ((dy != 0)?dy:View.TILE_HEIGHT) - 1;
-
-                drawer.drawString(10, 30 + i*20, String.format("%d rect: %d:%d", i+1,  nx, ny), textFont, Color.red);
-
-                drawer.drawRect(nx-1, ny-1, View.TILE_WIDTH, View.TILE_HEIGHT, PColor.BLUE);
-
-                if (i == 1) {
-                    lx = 1;
-                } else if (i == 0) {
-                    ly = 1;
-                } else if (i == 2) {
-                    ly = 0;
-                }
+                drawer.drawString(10, 30 + i*20, String.format("%d rect: %d:%d", i+1, p.getX(), p.getY()), textFont, Color.red);
+                drawer.drawRect(p.getX() - 1, p.getY() - 1, View.TILE_WIDTH, View.TILE_HEIGHT, PColor.BLUE);
             }
 
             drawer.drawString(10, 10, String.format("Player pos: %d:%d", px, py), textFont, Color.red);
