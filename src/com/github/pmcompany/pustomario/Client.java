@@ -16,8 +16,9 @@ public class Client implements Runnable, GameManager, OutputServer {
     public static final int SCREEN_HEIGHT = 480;
 
     private LWJGLComplex lwjgl;
-    private Preprocessor preprocessor;
     private ConcreteGame game;
+
+    private boolean debug;
 
     private boolean turnOff;
 
@@ -31,7 +32,6 @@ public class Client implements Runnable, GameManager, OutputServer {
         lwjgl.setTitle(GAME_TITLE);
 
         // Link components
-        lwjgl.addInputHandler(preprocessor);
         lwjgl.addEventHandler(game);
 //        preprocessor.addEventHandler(game);
 
@@ -66,5 +66,13 @@ public class Client implements Runnable, GameManager, OutputServer {
 
     public void removeOutputHandler(OutputHandler handler) {
         // Implements formally
+    }
+
+    public void switchDebugMode() {
+        debug = !debug;
+    }
+
+    public boolean isDebugMode() {
+        return debug;
     }
 }

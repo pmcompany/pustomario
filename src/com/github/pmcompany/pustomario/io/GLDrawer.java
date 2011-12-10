@@ -37,15 +37,27 @@ public class GLDrawer {
         glMatrixMode(GL_MODELVIEW);
     }
 
-    public void drawRect(int x, int y, int width, int height, PColor color) {
+    private void drawRect(int x, int y, int width, int height, PColor color, boolean fill) {
         glColor3f(color.getRed(), color.getGreen(), color.getBlue());
 
-        glBegin(GL_QUADS);
+        if (fill) {
+            glBegin(GL_QUADS);
+        } else {
+            glBegin(GL_LINE_LOOP);
+        }
         glVertex2i(x, screenHeight - y);
         glVertex2i(x, screenHeight - (y + height));
         glVertex2i(x + width, screenHeight - (y + height));
         glVertex2i(x + width, screenHeight - y);
         glEnd();
+    }
+
+    public void fillRect(int x, int y, int width, int height, PColor color) {
+        drawRect(x, y, width, height, color, true);
+    }
+
+    public void drawRect(int x, int y, int width, int height, PColor color) {
+        drawRect(x, y, width, height, color, false);
     }
 
     public void drawString(int x, int y, String s, Font font, Color color) {

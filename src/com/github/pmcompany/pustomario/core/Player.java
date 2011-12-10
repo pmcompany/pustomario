@@ -39,6 +39,10 @@ public class Player {
         return watchingRight;
     }
 
+    public void setWatchingRight(boolean watchingRight) {
+        this.watchingRight = watchingRight;
+    }
+
     public float getSpeedX() {
         return speedX;
     }
@@ -65,5 +69,9 @@ public class Player {
                 watchingRight = false;
             }
         }
+    }
+
+    public void accelerateY(float accelerationY) {
+        speedY += accelerationY;
     }
 }

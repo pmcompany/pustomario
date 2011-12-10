@@ -29,12 +29,16 @@ public class Map {
         return grid[index(x, y)];
     }
 
+    public boolean isBlocked(int x, int y) {
+        return getAt(x, y) == '#';
+    }
+
     public void setAt(int x, int y, int value) {
         grid[index(x, y)] = value;
     }
 
     private int index(int x, int y) {
-        return x + width*y;
+        return x-1 + width*(y-1);
     }
 
     public int getWidth() {
