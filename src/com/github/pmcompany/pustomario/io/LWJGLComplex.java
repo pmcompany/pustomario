@@ -127,8 +127,8 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
 
         int eyeX = px;
         int eyeY = py + (int)(0.25f * View.TILE_YRADIUS);
-        int eyeW = (int)(1f/2 * View.TILE_XRADIUS);
-        int eyeH = (int)(1f/2 * View.TILE_YRADIUS);
+        int eyeW = (int)(0.5f * View.TILE_XRADIUS);
+        int eyeH = (int)(0.5f * View.TILE_YRADIUS);
 
 //        if (game.isPlayerWatchingRight()) {
 //            eyeX += (int)(0.25 * View.TILE_XRADIUS);
@@ -147,5 +147,9 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
 
     public void removeEventHandler(EventHandler handler) {
         handlers.remove(handler);
+    }
+
+    public void updateGame() {
+        game.update();
     }
 }

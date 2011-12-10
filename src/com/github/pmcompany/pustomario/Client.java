@@ -43,6 +43,7 @@ public class Client implements Runnable, GameManager, OutputServer {
         game.initGame();
         while (! (turnOff || lwjgl.isCloseRequested())) {
             lwjgl.checkInput();
+            lwjgl.updateGame();
             lwjgl.handleOutput();
         }
 

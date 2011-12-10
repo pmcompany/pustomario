@@ -14,11 +14,15 @@ public class ConcreteGame implements EventHandler, DataProvider {
     private Map map;
     private Player player;
 
+    private long updateTime;
+
     public ConcreteGame() {
     }
 
     public void initGame() {
         loadMap();
+
+        updateTime = System.currentTimeMillis();
     }
 
     private void loadMap() {
@@ -60,8 +64,6 @@ public class ConcreteGame implements EventHandler, DataProvider {
         switch (e.getType()) {
             case ACCELERATE_PLAYER: {
                 player.accelerateX(e.getFloatValue() * Physics.RUN_ACCELERATION_COEFFICIENT);
-                player.setX(player.getX() + (int)player.getSpeedX());
-                player.setSpeedX(0);
             } break;
         }
     }
@@ -88,5 +90,20 @@ public class ConcreteGame implements EventHandler, DataProvider {
 
     public boolean isPlayerWatchingRight() {
         return player.isWatchingRight();
+    }
+
+    public void update() {
+        long currTime = System.currentTimeMillis();
+        long diff = currTime - updateTime;
+
+        // Count dynamic objects position,
+        // using physical laws and time value
+
+        if (player.getSpeedX() != 0) {
+            player.setX(player.getX() + (int)player.getSpeedX());
+            player.setSpeedX(0);
+        }
+
+        updateTime = currTime;
     }
 }

@@ -12,4 +12,6 @@ public interface DataProvider {
 
     public int getMapWidth();
     public int getMapHeight();
+
+    public void update();
 }
