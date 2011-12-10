@@ -160,13 +160,23 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
         // DEBUG BEGIN
         if (gmanager.isDebugMode()) {
 
-            Point p;
-            List<Point> crossedPoints = game.getPlayerCrossedTiles();
-            for (int i = 0; i < crossedPoints.size(); i++) {
-                p = crossedPoints.get(i);
+            Point tileP;
+            Point absTileStartP;
 
-                drawer.drawString(10, 30 + i*20, String.format("%d rect: %d:%d", i+1, p.getX(), p.getY()), textFont, Color.red);
-                drawer.drawRect(p.getX() - 1, p.getY() - 1, View.TILE_WIDTH, View.TILE_HEIGHT, PColor.BLUE);
+            List<Point> crossedTiles = game.getPlayerCrossedTiles();
+            for (int i = 0; i < crossedTiles.size(); i++) {
+                tileP = crossedTiles.get(i);
+                absTileStartP = game.countAbsByTile(tileP.getX(), tileP.getY());
+
+                drawer.drawString(10, 30 + i * 20, String.format("%d rect: %d:%d", i + 1, absTileStartP.getX(), absTileStartP.getY()), textFont, Color.red);
+                drawer.drawRect(absTileStartP.getX() - 1, absTileStartP.getY() - 1, View.TILE_WIDTH-1, View.TILE_HEIGHT-1, PColor.BLUE);
+            }
+
+            List<Point> neighTiles = game.getPlayerNeighbourTiles();
+            for (Point neighTile : neighTiles) {
+                absTileStartP = game.countAbsByTile(neighTile.getX(), neighTile.getY());
+
+                drawer.drawRect(absTileStartP.getX() - 1, absTileStartP.getY() - 1, View.TILE_WIDTH-1, View.TILE_HEIGHT-1, PColor.GREEN);
             }
 
             drawer.drawString(10, 10, String.format("Player pos: %d:%d", px, py), textFont, Color.red);

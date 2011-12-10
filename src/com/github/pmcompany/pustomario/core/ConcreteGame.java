@@ -79,6 +79,14 @@ public class ConcreteGame implements EventHandler, DataProvider {
         return map.getAt(x, y);
     }
 
+    public Point countTileByAbs(int absX, int absY) {
+        return new Point((absX-1) / View.TILE_WIDTH + 1, (absY-1) / View.TILE_HEIGHT + 1);
+    }
+
+    public Point countAbsByTile(int tX, int tY) {
+        return new Point((tX - 1) * View.TILE_WIDTH + 1, (tY - 1) * View.TILE_HEIGHT + 1);
+    }
+
     public boolean isTileBlocked(int x, int y) {
         return map.isBlocked(x, y);
     }
@@ -176,7 +184,7 @@ public class ConcreteGame implements EventHandler, DataProvider {
             nx -= ((dx != 0)?dx:View.TILE_WIDTH) - 1;
             ny -= ((dy != 0)?dy:View.TILE_HEIGHT) - 1;
 
-            p = new Point(nx, ny);
+            p = countTileByAbs(nx, ny);
 
             if (! tilesList.contains(p)) {
                 tilesList.add(p);
@@ -192,6 +200,44 @@ public class ConcreteGame implements EventHandler, DataProvider {
         }
 
         return tilesList;
+    }
+
+    /*
+     *    128  1   16
+     *       \ ^ /
+     *     8 < . > 2
+     *       / V \
+     *    64   4   32
+     */
+    public List<Point> getPlayerNeighbourTiles() {
+        List<Point> points = new LinkedList<Point>();
+
+        List<Point> crossedTiles = getPlayerCrossedTiles();
+
+        int lx;
+        int ly;
+
+        int[] clx = new int[]{0, 1, 1, 1, 0, -1, -1, -1};
+        int[] cly = new int[]{1, 1, 0, -1, -1, -1, 0, 1};
+
+        Point nP;
+        Point crossedP;
+        for (int i = 0; i < crossedTiles.size(); i++) {
+            crossedP = crossedTiles.get(i);
+
+            for (int j = 0; j < 8; j++) {
+                lx = clx[j];
+                ly = cly[j];
+
+                nP = new Point(crossedP.getX() + lx, crossedP.getY() + ly);
+
+                if (! crossedTiles.contains(nP)) {
+                    points.add(nP);
+                }
+            }
+        }
+
+        return points;
     }
 
 //    private int[][] getPlayerTiles() {

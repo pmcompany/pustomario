@@ -7,11 +7,17 @@ import java.util.List;
  */
 public interface DataProvider {
     public int getTileAt(int x, int y);
+    public boolean isTileBlocked(int x, int y);
+
+    public Point countTileByAbs(int absX, int absY);
+    public Point countAbsByTile(int tX, int tY);
 
     public int getPlayerX();
     public int getPlayerY();
     public boolean isPlayerWatchingRight();
+
     public List<Point> getPlayerCrossedTiles();
+    public List<Point> getPlayerNeighbourTiles();
 
     public int getMapWidth();
     public int getMapHeight();
