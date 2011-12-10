@@ -176,7 +176,11 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
             for (Point neighTile : neighTiles) {
                 absTileStartP = game.countAbsByTile(neighTile.getX(), neighTile.getY());
 
-                drawer.drawRect(absTileStartP.getX() - 1, absTileStartP.getY() - 1, View.TILE_WIDTH-1, View.TILE_HEIGHT-1, PColor.GREEN);
+                if (game.isTileBlocked(neighTile.getX(), neighTile.getY())) {
+                    drawer.drawRect(absTileStartP.getX() - 1, absTileStartP.getY() - 1, View.TILE_WIDTH-1, View.TILE_HEIGHT-1, PColor.RED);
+                } else {
+                    drawer.drawRect(absTileStartP.getX() - 1, absTileStartP.getY() - 1, View.TILE_WIDTH-1, View.TILE_HEIGHT-1, PColor.GREEN);
+                }
             }
 
             drawer.drawString(10, 10, String.format("Player pos: %d:%d", px, py), textFont, Color.red);
