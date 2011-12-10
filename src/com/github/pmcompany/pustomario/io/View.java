@@ -4,6 +4,9 @@ package com.github.pmcompany.pustomario.io;
  * @author dector (dector9@gmail.com)
  */
 public class View {
+    public static final int SCREEN_WIDTH = 640;
+    public static final int SCREEN_HEIGHT = 480;
+
     public static final int TILE_WIDTH = 16;
     public static final int TILE_HEIGHT = 16;
 
@@ -14,33 +17,31 @@ public class View {
     public static final PColor HERO_COLOR = PColor.RED;
     public static final PColor EYE_COLOR = PColor.BLACK;
     public static final PColor BACK_COLOR = new PColor(0.3f, 0.3f, 0.3f, 0.3f);
-    private int leftX;
-    private int leftY;
+
+    public static final int HORISONTAL_SCROLL_BORDER = SCREEN_WIDTH / 3;
+    public static final int VERTICAL_SCROLL_BORDER = SCREEN_HEIGHT / 3;
+
+    private int screenStartX;
+    private int screenStartY;
 
     public View() {
+        screenStartX = 0;
+        screenStartY = 0;
     }
 
-    public int getLeftX() {
-        return leftX;
+    public int getScreenStartX() {
+        return screenStartX;
     }
 
-    public void setLeftX(int leftX) {
-        this.leftX = leftX;
+    public void setScreenStartX(int screenStartX) {
+        this.screenStartX = screenStartX;
     }
 
-    public int getLeftY() {
-        return leftY;
+    public int getScreenStartY() {
+        return screenStartY;
     }
 
-    public void setLeftY(int leftY) {
-        this.leftY = leftY;
-    }
-
-    public int getTileX(int absoluteX) {
-        return absoluteX / TILE_WIDTH;
-    }
-
-    public int getTileY(int absoluteY) {
-        return absoluteY / TILE_HEIGHT;
+    public void setScreenStartY(int screenStartY) {
+        this.screenStartY = screenStartY;
     }
 }

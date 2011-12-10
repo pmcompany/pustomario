@@ -5,15 +5,13 @@ import com.github.pmcompany.pustomario.core.GameManager;
 import com.github.pmcompany.pustomario.io.LWJGLComplex;
 import com.github.pmcompany.pustomario.io.OutputHandler;
 import com.github.pmcompany.pustomario.io.OutputServer;
+import com.github.pmcompany.pustomario.io.View;
 
 /**
  * @author dector (dector9@gmail.com)
  */
 public class Client implements Runnable, GameManager, OutputServer {
     public static final String GAME_TITLE = "Pustomario";
-
-    public static final int SCREEN_WIDTH = 640;
-    public static final int SCREEN_HEIGHT = 480;
 
     private LWJGLComplex lwjgl;
     private ConcreteGame game;
@@ -25,7 +23,7 @@ public class Client implements Runnable, GameManager, OutputServer {
     public Client() {
         // Create components
         game = new ConcreteGame();
-        lwjgl = new LWJGLComplex(this, game, SCREEN_WIDTH, SCREEN_HEIGHT);
+        lwjgl = new LWJGLComplex(this, game, View.SCREEN_WIDTH, View.SCREEN_HEIGHT);
 //        preprocessor = new Preprocessor();
 
         // Configure components
