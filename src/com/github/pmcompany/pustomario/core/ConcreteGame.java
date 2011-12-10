@@ -70,7 +70,20 @@ public class ConcreteGame implements EventHandler, DataProvider {
                 player.accelerateX(e.getFloatValue() * Physics.RUN_ACCELERATION_COEFFICIENT);
             } break;
             case ACCELERATE_Y_PLAYER: {
-                player.accelerateY(e.getFloatValue() * Physics.RUN_ACCELERATION_COEFFICIENT);
+                player.accelerateY(e.getFloatValue());
+            } break;
+
+            case RUN_RIGHT: {
+                player.accelerateX(Physics.RUN_SPEED);
+            } break;
+            case RUN_LEFT: {
+                player.accelerateX(-Physics.RUN_SPEED);
+            } break;
+            case JUMP: {
+                if (player.isCanJump()) {
+                    player.accelerateY(Physics.JUMP_SPEED);
+                    player.setCanJump(false);
+                }
             } break;
         }
     }
@@ -131,58 +144,22 @@ public class ConcreteGame implements EventHandler, DataProvider {
         updateTime = currTime;
     }
 
-    public void endUpdate() {
-        player.setSpeedX(0);
-        player.setSpeedY(0);
+    public void postUpdate() {
+//        player.setSpeedX(0);
+//        player.setSpeedY(0);
     }
 
     private void movePlayer() {
+        player.accelerateY(Physics.GRAVITY_ACCELERATION);
+        player.setSpeedX(player.getSpeedX() * Physics.GROUND_ONE_ON_FRICTION);
+
         int px = player.getX();
         int py = player.getY();
         float speedX = player.getSpeedX();
         float speedY = player.getSpeedY();
 
-        // Get neightbour tiles for selected direction(speedX, speedY)
         // Move player
 
-//        int direction = 0;
-//
-//        if (speedX != 0) {
-//            if (speedX > 0) {
-//                direction |= VectorDirection.RIGHT;
-//            } else {
-//                direction |= VectorDirection.LEFT;
-//            }
-//        }
-//
-//        if (speedY != 0) {
-//            if (speedY > 0) {
-//                direction |= VectorDirection.UP;
-//            } else {
-//                direction |= VectorDirection.DOWN;
-//            }
-//        }
-//
-//        float minX = View.TILE_WIDTH;
-//        float minY = View.TILE_HEIGHT;
-//
-//        int nX;
-//        int nY;
-//        int dx;
-//        int dy;
-//        for (Point p : getPlayerNeighbourTiles(direction)) {
-//            nX = p.getX();
-//            nY = p.getY();
-//
-//            dx = nX - px;
-//            dy = nY - py;
-//
-//            if (isTileBlocked(nX, nY)) {
-//                minY = Math.min(minY, coun)
-//            }
-//        }
-
-        Point newPlayerPoint;
         Point newCrossedTile;
         List<Point> crossedTiles;
         boolean crosses = false;
@@ -201,8 +178,11 @@ public class ConcreteGame implements EventHandler, DataProvider {
 
             if (crosses) {
                 player.setX(px);
+                player.setSpeedX(0);
             }
         }
+
+        crosses = false;
 
         if (speedY != 0) {
             player.setY(py + (int)speedY);
@@ -218,6 +198,11 @@ public class ConcreteGame implements EventHandler, DataProvider {
 
             if (crosses) {
                 player.setY(py);
+
+                if (speedY < 0) {
+                    player.setCanJump(true);
+                }
+                player.setSpeedY(0);
             }
         }
     }

@@ -11,12 +11,14 @@ public class Player {
     private float speedY;
 
     private boolean watchingRight;
+    private boolean canJump;
 
     public Player(int x, int y) {
         this.x = x;
         this.y = y;
 
         watchingRight = true;
+        canJump = true;
     }
 
     public int getX() {
@@ -73,5 +75,13 @@ public class Player {
 
     public void accelerateY(float accelerationY) {
         speedY += accelerationY;
+    }
+
+    public boolean isCanJump() {
+        return canJump;
+    }
+
+    public void setCanJump(boolean canJump) {
+        this.canJump = canJump;
     }
 }

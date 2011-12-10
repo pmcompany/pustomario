@@ -58,15 +58,13 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
 
     public void checkInput() {
         if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
-            sendEvent(new GameEvent(EventType.ACCELERATE_X_PLAYER, 3.2f));
+            sendEvent(new GameEvent(EventType.RUN_RIGHT, null));
         } else if (Keyboard.isKeyDown(Keyboard.KEY_LEFT)) {
-            sendEvent(new GameEvent(EventType.ACCELERATE_X_PLAYER, -3.2f));
+            sendEvent(new GameEvent(EventType.RUN_LEFT, null));
         }
 
         if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
-            sendEvent(new GameEvent(EventType.ACCELERATE_Y_PLAYER, 3.2f));
-        } else if (Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
-            sendEvent(new GameEvent(EventType.ACCELERATE_Y_PLAYER, -3.2f));
+            sendEvent(new GameEvent(EventType.JUMP, null));
         }
 
         if (Keyboard.next()) {

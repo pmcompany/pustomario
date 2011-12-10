@@ -45,7 +45,7 @@ public class Client implements Runnable, GameManager, OutputServer {
             lwjgl.checkInput();
             game.preUpdate();
             lwjgl.handleOutput();
-            game.endUpdate();
+            game.postUpdate();
         }
 
         halt();
