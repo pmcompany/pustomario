@@ -96,6 +96,10 @@ public class ConcreteGame implements EventHandler, DataProvider {
         return new Point((absX-1) / View.TILE_WIDTH + 1, (absY-1) / View.TILE_HEIGHT + 1);
     }
 
+    public Point countAbsByTile(Point p) {
+        return countAbsByTile(p.getX(), p.getY());
+    }
+
     public Point countAbsByTile(int tX, int tY) {
         return new Point((tX - 1) * View.TILE_WIDTH + 1, (tY - 1) * View.TILE_HEIGHT + 1);
     }
@@ -160,7 +164,7 @@ public class ConcreteGame implements EventHandler, DataProvider {
 
         // Move player
 
-        Point newCrossedTile;
+        Point newCrossedTile = null;
         List<Point> crossedTiles;
         boolean crosses = false;
 
@@ -197,7 +201,7 @@ public class ConcreteGame implements EventHandler, DataProvider {
             }
 
             if (crosses) {
-                player.setY(py);
+               player.setY(py);
 
                 if (speedY < 0) {
                     player.setCanJump(true);
