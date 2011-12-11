@@ -186,7 +186,7 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
         int eyeH = (int)(0.2f * View.TILE_HEIGHT);
 
         if (game.isPlayerWatchingRight()) {
-            eyeX += (int)(0.65f * View.TILE_WIDTH);
+            eyeX += (int)(0.70f * View.TILE_WIDTH);
         } else {
             eyeX += (int)(0.25f * View.TILE_WIDTH);
         }
