@@ -127,14 +127,40 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
 //            }
 //        }
 
+        int px = game.getPlayerX();
+        int py = game.getPlayerY();
+
+        Point stTileP = game.countTileByAbs(px - View.SCREEN_WIDTH/2, py - View.SCREEN_HEIGHT/2);
+        if (stTileP.getX() <= 0) {
+            stTileP.setX(1);
+            view.setScreenStartX(View.SCREEN_WIDTH/2 - px);
+        } else {
+            view.setScreenStartX(-px + View.SCREEN_WIDTH/2 + game.countAbsByTile(stTileP.getX(), stTileP.getY()).getX() - 1);
+        }
+        if (stTileP.getY() <= 0) {
+            stTileP.setY(1);
+            view.setScreenStartY(View.SCREEN_HEIGHT/2 - py);
+        } else {
+            view.setScreenStartY(-py + View.SCREEN_HEIGHT/2 + game.countAbsByTile(stTileP.getX(), stTileP.getY()).getY() - 1);
+        }
+
+        Point endTileP = game.countTileByAbs(px + View.SCREEN_WIDTH/2, py + View.SCREEN_HEIGHT/2);
+        if (endTileP.getX() > game.getMapWidth()) {
+            endTileP.setX(game.getMapWidth());
+        }
+        if (endTileP.getY() > game.getMapHeight()) {
+            endTileP.setY(game.getMapHeight());
+        }
+
         int tile;
-        for (int x = 1; x <= game.getMapWidth(); x++) {
-            for (int y = 1; y <= game.getMapHeight(); y++) {
-                tile = game.getTileAt(x, y);
+        for (int ix = stTileP.getX(); ix <= endTileP.getX(); ix++) {
+            for (int iy = stTileP.getY(); iy <= endTileP.getY(); iy++) {
+                tile = game.getTileAt(ix, iy);
 
                 if (tile != 0) {
                     if (tile == '#') {
-                        drawer.fillRect((x-1) * View.TILE_WIDTH, (y-1) * View.TILE_HEIGHT,
+                        drawer.fillRect(view.getScreenStartX() + (ix - stTileP.getX()) * View.TILE_WIDTH,
+                                view.getScreenStartY() + (iy - stTileP.getY()) * View.TILE_HEIGHT,
                                 View.TILE_WIDTH, View.TILE_HEIGHT, View.WALL_COLOR);
                     }
                 }
@@ -146,15 +172,21 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
         int px = game.getPlayerX();
         int py = game.getPlayerY();
 
-        drawer.fillRect(px-1, py-1, View.TILE_WIDTH, View.TILE_HEIGHT, View.HERO_COLOR);
+        int realPx = View.SCREEN_WIDTH/2 - 1;
+        int realPy = View.SCREEN_HEIGHT/2 - 1;
 
-        int eyeX = px;
-        int eyeY = py + (int)(0.65f * View.TILE_HEIGHT);
+//        drawer.fillRect(view.getScreenStartX() + px-1, view.getScreenStartY() + py-1,
+//                View.TILE_WIDTH, View.TILE_HEIGHT, View.HERO_COLOR);
+        drawer.fillRect(realPx, realPy,
+                View.TILE_WIDTH, View.TILE_HEIGHT, View.HERO_COLOR);
+
+        int eyeX = realPx;
+        int eyeY = realPy + (int)(0.65f * View.TILE_HEIGHT);
         int eyeW = (int)(0.2f * View.TILE_WIDTH);
         int eyeH = (int)(0.2f * View.TILE_HEIGHT);
 
         if (game.isPlayerWatchingRight()) {
-            eyeX += (int)(0.60f * View.TILE_WIDTH);
+            eyeX += (int)(0.65f * View.TILE_WIDTH);
         } else {
             eyeX += (int)(0.25f * View.TILE_WIDTH);
         }
@@ -165,13 +197,18 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
             Point tileP;
             Point absTileStartP;
 
+            int pRelativeX = realPx - px;
+            int pRelativeY = realPy - py;
+
             List<Point> crossedTiles = game.getPlayerCrossedTiles();
             for (int i = 0; i < crossedTiles.size(); i++) {
                 tileP = crossedTiles.get(i);
                 absTileStartP = game.countAbsByTile(tileP.getX(), tileP.getY());
 
 //                drawer.drawString(10, 30 + i * 20, String.format("%d rect: %d:%d", i + 1, absTileStartP.getX(), absTileStartP.getY()), textFont, Color.red);
-                drawer.drawRect(absTileStartP.getX() - 1, absTileStartP.getY() - 1, View.TILE_WIDTH-1, View.TILE_HEIGHT-1, PColor.BLUE);
+                drawer.drawRect(absTileStartP.getX() + pRelativeX,
+                        absTileStartP.getY() + pRelativeY,
+                        View.TILE_WIDTH, View.TILE_HEIGHT-1, PColor.BLUE);
             }
 
             int direction = 0;
@@ -199,14 +236,20 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
                 absTileStartP = game.countAbsByTile(neighTile.getX(), neighTile.getY());
 
                 if (game.isTileBlocked(neighTile.getX(), neighTile.getY())) {
-                    drawer.drawRect(absTileStartP.getX() - 1, absTileStartP.getY() - 1, View.TILE_WIDTH-1, View.TILE_HEIGHT-1, PColor.RED);
+                    drawer.drawRect(absTileStartP.getX() + pRelativeX,
+                            absTileStartP.getY() + pRelativeY,
+                            View.TILE_WIDTH, View.TILE_HEIGHT-1, PColor.RED);
                 } else {
-                    drawer.drawRect(absTileStartP.getX() - 1, absTileStartP.getY() - 1, View.TILE_WIDTH-1, View.TILE_HEIGHT-1, PColor.GREEN);
+                    drawer.drawRect(absTileStartP.getX() + pRelativeX,
+                            absTileStartP.getY() + pRelativeY,
+                            View.TILE_WIDTH, View.TILE_HEIGHT-1, PColor.GREEN);
                 }
             }
 
             drawer.drawString(10, 10, String.format("Player pos: %d:%d", px, py), textFont, Color.red);
             drawer.drawString(10, 30, String.format("Vx: %.3f\t\t Vy:%.3f", speedX, speedY), textFont, Color.red);
+            drawer.drawString(10, 50, String.format("Start screen: %d:%d",
+                    view.getScreenStartX(), view.getScreenStartY()), textFont, Color.red);
 
         }
         // DEBUG END

@@ -18,9 +18,6 @@ public class View {
     public static final PColor EYE_COLOR = PColor.BLACK;
     public static final PColor BACK_COLOR = new PColor(0.3f, 0.3f, 0.3f, 0.3f);
 
-    public static final int HORISONTAL_SCROLL_BORDER = SCREEN_WIDTH / 3;
-    public static final int VERTICAL_SCROLL_BORDER = SCREEN_HEIGHT / 3;
-
     private int screenStartX;
     private int screenStartY;
 
