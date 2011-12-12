@@ -39,4 +39,9 @@ public class GameEvent implements Event {
     public float getFloatValue() {
         return (Float)value;
     }
+
+    @Override
+    public String toString() {
+        return type.toString();
+    }
 }

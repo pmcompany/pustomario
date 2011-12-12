@@ -6,6 +6,9 @@ import com.github.pmcompany.pustomario.io.LWJGLComplex;
 import com.github.pmcompany.pustomario.io.OutputHandler;
 import com.github.pmcompany.pustomario.io.OutputServer;
 import com.github.pmcompany.pustomario.io.View;
+import com.github.pmcompany.pustomario.net.ConcreteNetworkClient;
+import com.github.pmcompany.pustomario.net.Network;
+import com.github.pmcompany.pustomario.net.NetworkClient;
 
 /**
  * @author dector (dector9@gmail.com)
@@ -17,10 +20,14 @@ public class Client implements Runnable, GameManager, OutputServer {
     private ConcreteGame game;
 
     private boolean debug;
-
     private boolean turnOff;
 
-    public Client() {
+    private String name;
+    private NetworkClient client;
+
+    public Client(String name) {
+        this.name = name;
+
         // Create components
         game = new ConcreteGame();
         lwjgl = new LWJGLComplex(this, game, View.SCREEN_WIDTH, View.SCREEN_HEIGHT);
@@ -35,6 +42,11 @@ public class Client implements Runnable, GameManager, OutputServer {
 
         // Managed states initial value
         turnOff = false;
+
+        client = new ConcreteNetworkClient(this, Network.HOST, Network.PORT);
+        client.start();
+
+        lwjgl.addEventHandler(client);
     }
 
     public void run() {
@@ -73,5 +85,21 @@ public class Client implements Runnable, GameManager, OutputServer {
 
     public boolean isDebugMode() {
         return debug;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void connect() {
+        client.connect();
+    }
+
+    public void disconnect() {
+        client.disconnect();
     }
 }
