@@ -12,6 +12,8 @@ import java.io.ObjectOutput;
 public class NetworkPackage {
     private static final NetworkPackage DEFAULT_PACKAGE =
             new NetworkPackage(PackageType.OK, null);
+    private static final NetworkPackage SPECTATE_PACKAGE =
+            new NetworkPackage(PackageType.SPECTATE, null);
 
     private PackageType type;
     private String value;
@@ -50,5 +52,9 @@ public class NetworkPackage {
 
     public static NetworkPackage defaultPackage() {
         return DEFAULT_PACKAGE;
+    }
+
+    public static NetworkPackage spectatePackage() {
+        return SPECTATE_PACKAGE;
     }
 }

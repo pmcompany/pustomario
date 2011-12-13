@@ -96,6 +96,16 @@ public class ConcreteNetworkClient extends Thread implements NetworkClient {
         }
     }
 
+    public void spectate() {
+        if (isConnected()) {
+            try {
+                send(NetworkPackage.spectatePackage());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public void disconnect() {
         if (isConnected()) {
             try {

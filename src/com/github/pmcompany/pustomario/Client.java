@@ -105,6 +105,10 @@ public class Client implements Runnable, GameManager, OutputServer {
         client.connect();
     }
 
+    public void spectate() {
+        client.spectate();
+    }
+
     public void disconnect() {
         client.disconnect();
     }

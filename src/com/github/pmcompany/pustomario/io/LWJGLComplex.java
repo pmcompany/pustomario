@@ -72,6 +72,7 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
                 switch (Keyboard.getEventKey()) {
                     case Keyboard.KEY_D: gmanager.switchDebugMode(); break;
                     case Keyboard.KEY_F5: gmanager.connect(); break;
+                    case Keyboard.KEY_F6: gmanager.spectate(); break;
                     case Keyboard.KEY_F9: gmanager.disconnect(); break;
                 }
             }
