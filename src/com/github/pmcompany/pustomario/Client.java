@@ -10,6 +10,8 @@ import com.github.pmcompany.pustomario.net.ConcreteNetworkClient;
 import com.github.pmcompany.pustomario.net.Network;
 import com.github.pmcompany.pustomario.net.NetworkClient;
 
+import javax.swing.*;
+
 /**
  * @author dector (dector9@gmail.com)
  */
@@ -25,9 +27,7 @@ public class Client implements Runnable, GameManager, OutputServer {
     private String name;
     private NetworkClient client;
 
-    public Client(String name) {
-        this.name = name;
-
+    public Client() {
         // Create components
         game = new ConcreteGame();
         lwjgl = new LWJGLComplex(this, game, View.SCREEN_WIDTH, View.SCREEN_HEIGHT);
@@ -68,6 +68,8 @@ public class Client implements Runnable, GameManager, OutputServer {
     private void halt() {
         lwjgl.turnOff();
 
+        disconnect();
+
         System.out.println("Turning off...");
     }
 
@@ -96,6 +98,10 @@ public class Client implements Runnable, GameManager, OutputServer {
     }
 
     public void connect() {
+        if (name == null) {
+            name = JOptionPane.showInputDialog("Enter player's name");
+        }
+
         client.connect();
     }
 

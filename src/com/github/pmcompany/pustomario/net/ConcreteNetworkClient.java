@@ -53,8 +53,12 @@ public class ConcreteNetworkClient extends Thread implements NetworkClient {
     private NetworkPackage send(NetworkPackage p) throws IOException {
         NetworkPackage result = null;
 
+        String ans;
         if (isConnected()) {
             out.println(p);
+            if ((ans = in.readLine()) != null) {
+                result = new NetworkPackage(ans);
+            }
         } else {
             throw new NotConnectedException(String.format("Not connected to %s:%d", host, port));
         }
@@ -69,9 +73,6 @@ public class ConcreteNetworkClient extends Thread implements NetworkClient {
         try {
             s = new Socket(host, port);
 
-//            in = new ObjectInputStream(new BufferedInputStream(s.getInputStream()));
-//            out = new ObjectOutputStream(new BufferedOutputStream(s.getOutputStream()));
-
             in = new BufferedReader(new InputStreamReader(s.getInputStream()));
             out = new PrintWriter(new OutputStreamWriter(s.getOutputStream()), true);
 
@@ -84,7 +85,12 @@ public class ConcreteNetworkClient extends Thread implements NetworkClient {
         System.out.printf("Connected to %s:%d%n", host, port);
 
         try {
-            send(new NetworkPackage(PackageType.CONNECT, gmanager.getName()));
+            NetworkPackage result =
+                    send(new NetworkPackage(PackageType.CONNECT, gmanager.getName()));
+
+            if (result.getType() == PackageType.CONNECTED) {
+                System.out.println("Connected OK");
+            }
         } catch (IOException e) {
             System.out.println("Sending name failed");
         }

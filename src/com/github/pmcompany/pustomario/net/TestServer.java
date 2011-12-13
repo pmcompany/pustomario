@@ -24,11 +24,26 @@ public class TestServer implements Runnable {
             PrintWriter out = new PrintWriter(new OutputStreamWriter(s.getOutputStream()), true);
 
             String str;
+            NetworkPackage p;
+            NetworkPackage response;
             boolean done = false;
             while (! done) {
                 str = in.readLine();
                 if (str != null) {
-                    System.out.println(str);
+                    p = new NetworkPackage(str);
+
+                    switch (p.getType()) {
+                        case CONNECT: {
+                            response = new NetworkPackage(PackageType.CONNECTED, null);
+                        } break;
+                        default: {
+                            response = NetworkPackage.defaultPackage();
+                        }
+                    }
+                    out.println(response);
+
+                    System.out.println(p);
+                    System.out.println("Response : " + response);
                 }
             }
 

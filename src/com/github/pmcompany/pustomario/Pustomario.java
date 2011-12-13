@@ -8,10 +8,7 @@ import javax.swing.*;
 public class Pustomario {
     public static void main(String[] args) {
 
-        String gameName;
-        gameName = JOptionPane.showInputDialog("Enter player's name");
-
-        Client c = new Client(gameName);
+        Client c = new Client();
         c.run();
 
         System.out.println("See you next time!");
