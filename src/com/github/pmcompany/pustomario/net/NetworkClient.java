@@ -9,8 +9,9 @@ import com.github.pmcompany.pustomario.core.EventServer;
  */
 public interface NetworkClient extends EventServer, EventHandler {
     public void start();
-    public void connect();
-    public void spectate();
-    public void disconnect();
+    public void conectServer();
+    public void joinGame(int x, int y);
+    public void spectateGame();
+    public void disconnectServer();
     public boolean isConnected();
 }

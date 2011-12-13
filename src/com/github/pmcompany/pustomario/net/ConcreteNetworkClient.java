@@ -1,9 +1,6 @@
 package com.github.pmcompany.pustomario.net;
 
-import com.github.pmcompany.pustomario.core.Event;
-import com.github.pmcompany.pustomario.core.EventHandler;
-import com.github.pmcompany.pustomario.core.EventServer;
-import com.github.pmcompany.pustomario.core.GameManager;
+import com.github.pmcompany.pustomario.core.*;
 
 import java.io.*;
 import java.net.Socket;
@@ -19,9 +16,10 @@ public class ConcreteNetworkClient extends Thread implements NetworkClient {
     private int port;
 
     private Socket s;
-    BufferedReader in;
-    PrintWriter out;
+    private BufferedReader in;
+    private PrintWriter out;
     private boolean connected;
+    private boolean joined;
 
     public ConcreteNetworkClient(GameManager gmanager, String host, int port) {
         this.gmanager = gmanager;
@@ -67,7 +65,7 @@ public class ConcreteNetworkClient extends Thread implements NetworkClient {
         return result;
     }
 
-    public void connect() {
+    public void conectServer() {
         System.out.printf("Connecting with %s:%d ...%n", host, port);
 
         try {
@@ -75,14 +73,13 @@ public class ConcreteNetworkClient extends Thread implements NetworkClient {
 
             in = new BufferedReader(new InputStreamReader(s.getInputStream()));
             out = new PrintWriter(new OutputStreamWriter(s.getOutputStream()), true);
-
-            connected = true;
         } catch (IOException e) {
-            System.out.printf("Can't connect to %s:%d%n", host, port);
+            System.out.printf("Can't conectServer to %s:%d%n", host, port);
             e.printStackTrace();
         }
 
         System.out.printf("Connected to %s:%d%n", host, port);
+        connected = true;
 
         try {
             NetworkPackage result =
@@ -93,20 +90,52 @@ public class ConcreteNetworkClient extends Thread implements NetworkClient {
             }
         } catch (IOException e) {
             System.out.println("Sending name failed");
+            e.printStackTrace();
         }
     }
 
-    public void spectate() {
+    public void joinGame(int x, int y) {
         if (isConnected()) {
             try {
-                send(NetworkPackage.spectatePackage());
+                System.out.println("Sending join game request");
+
+                NetworkPackage answ = send(new NetworkPackage(PackageType.JOIN,
+                        String.format("%d %d", x, y)));
+                if (answ.getType() == PackageType.JOINED) {
+                    joined = true;
+                    System.out.println("Player joined");
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
     }
 
-    public void disconnect() {
+    public void spectateGame() {
+//        if (isConnected()) {
+//            try {
+//                NetworkPackage answ;
+//
+//                System.out.println("Sending spectateGame request");
+//
+//                answ = send(NetworkPackage.spectatePackage());
+//                if (answ.getType() == PackageType.SPECTATED) {
+//                    String[] playerPos = answ.getValue().split(" ");
+//
+//                    System.out.printf("Player pos: %s%n", answ.getValue());
+//
+//                    handler.handleEvent(new GameEvent(EventType.SET_PLAYER_X,
+//                            Integer.parseInt(playerPos[0])));
+//                    handler.handleEvent(new GameEvent(EventType.SET_PLAYER_Y,
+//                            Integer.parseInt(playerPos[1])));
+//                }
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+    }
+
+    public void disconnectServer() {
         if (isConnected()) {
             try {
                 s.close();
@@ -125,5 +154,9 @@ public class ConcreteNetworkClient extends Thread implements NetworkClient {
 
     public boolean isConnected() {
         return connected;
+    }
+
+    public boolean isJoined() {
+        return joined;
     }
 }

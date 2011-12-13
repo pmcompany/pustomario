@@ -10,10 +10,12 @@ import java.io.ObjectOutput;
  * @author dector (dector9@gmail.com)
  */
 public class NetworkPackage {
-    private static final NetworkPackage DEFAULT_PACKAGE =
+    public static final NetworkPackage DEFAULT_PACKAGE =
             new NetworkPackage(PackageType.OK, null);
-    private static final NetworkPackage SPECTATE_PACKAGE =
+    public static final NetworkPackage SPECTATE_PACKAGE =
             new NetworkPackage(PackageType.SPECTATE, null);
+    public static final NetworkPackage REJECTED_PACKAGE =
+            new NetworkPackage(PackageType.REJECTED, null);
 
     private PackageType type;
     private String value;
@@ -48,13 +50,5 @@ public class NetworkPackage {
     @Override
     public String toString() {
         return type + " " + value;
-    }
-
-    public static NetworkPackage defaultPackage() {
-        return DEFAULT_PACKAGE;
-    }
-
-    public static NetworkPackage spectatePackage() {
-        return SPECTATE_PACKAGE;
     }
 }

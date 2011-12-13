@@ -1,7 +1,6 @@
 package com.github.pmcompany.pustomario.net;
 
-import com.github.pmcompany.pustomario.core.EventHandler;
-import com.github.pmcompany.pustomario.core.EventServer;
+import com.github.pmcompany.pustomario.core.*;
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -12,12 +11,17 @@ import java.util.List;
 /**
  * @author dector (dector9@gmail.com)
  */
-public class TestServer implements Runnable, EventServer {
+public class TestServer implements Runnable, EventServer, EventHandler {
     private ServerSocket ss;
     private List<EventHandler> handlers;
+    private ConcreteGame game;
 
     public TestServer() {
         handlers = new LinkedList<EventHandler>();
+        game = new ConcreteGame();
+        game.initGame();
+
+        addEventHandler(game);
     }
 
     public void run() {
@@ -30,7 +34,7 @@ public class TestServer implements Runnable, EventServer {
 
             while (! done) {
                 Socket s = ss.accept();
-                new ServerThread(s).start();
+                new ServerThread(s, this, game).start();
             }
         } catch (IOException e) {
             e.printStackTrace();
@@ -48,5 +52,11 @@ public class TestServer implements Runnable, EventServer {
 
     public void removeEventHandler(EventHandler handler) {
         handlers.remove(handler);
+    }
+
+    public void handleEvent(Event e) {
+        for (EventHandler handler : handlers) {
+            handler.handleEvent(e);
+        }
     }
 }

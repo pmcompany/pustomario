@@ -1,5 +1,7 @@
 package com.github.pmcompany.pustomario.net;
 
+import com.github.pmcompany.pustomario.core.*;
+
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -10,14 +12,20 @@ import java.net.Socket;
 public class ServerThread extends Thread {
     private Socket s;
     private String name;
+    private DataProvider game;
+    private EventHandler server;
+    private boolean joined;
 
-    public ServerThread(Socket s) {
+    public ServerThread(Socket s, EventHandler server, DataProvider game) {
         this.s = s;
+        this.game = game;
+        this.server = server;
     }
 
     public void run() {
         try {
-            System.out.printf("Connected with %s%n", s.getLocalAddress().getHostName());
+            name = s.getLocalAddress().getHostName();
+            System.out.printf("Connected with %s%n", name);
 
             BufferedReader in = new BufferedReader(new InputStreamReader(s.getInputStream()));
             PrintWriter out = new PrintWriter(new OutputStreamWriter(s.getOutputStream()), true);
@@ -36,8 +44,42 @@ public class ServerThread extends Thread {
                             name = p.getValue();
                             response = new NetworkPackage(PackageType.CONNECTED, null);
                         } break;
+
+                        case JOIN: {
+                            String[] playerPos = p.getValue().split(" ");
+
+                            String px = playerPos[0];
+                            String py = playerPos[1];
+
+                            response = new NetworkPackage(PackageType.JOINED, null);
+
+                            joined = true;
+
+                            server.handleEvent(new GameEvent(EventType.SET_PLAYER_X, Integer.parseInt(px)));
+                            server.handleEvent(new GameEvent(EventType.SET_PLAYER_Y, Integer.parseInt(py)));
+                        } break;
+
+                        case GAME_EVENT: {
+                            if (joined) {
+                                System.out.println("Trying to handle " + p + " from " + name);
+                                response = NetworkPackage.DEFAULT_PACKAGE;
+//                                server.handleEvent(GameEventp.getValue());
+                            } else {
+                                response = NetworkPackage.REJECTED_PACKAGE;
+                            }
+                        } break;
+
+//                        case SPECTATE: {
+//                            int x = game.getPlayerX();
+//                            int y = game.getPlayerY();
+//
+//                            response = new NetworkPackage(PackageType.SPECTATED,
+//                                    String.format("%d %d", x, y));
+//
+//                        } break;
+
                         default: {
-                            response = NetworkPackage.defaultPackage();
+                            response = NetworkPackage.DEFAULT_PACKAGE;
                         }
                     }
                     out.println(response);

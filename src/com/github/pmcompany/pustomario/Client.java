@@ -68,7 +68,7 @@ public class Client implements Runnable, GameManager, OutputServer {
     private void halt() {
         lwjgl.turnOff();
 
-        disconnect();
+        disconnectServer();
 
         System.out.println("Turning off...");
     }
@@ -97,19 +97,30 @@ public class Client implements Runnable, GameManager, OutputServer {
         this.name = name;
     }
 
-    public void connect() {
+    public void connectServer() {
         if (name == null) {
-            name = JOptionPane.showInputDialog("Enter player's name");
+            enterName();
         }
 
-        client.connect();
+        client.conectServer();
     }
 
-    public void spectate() {
-        client.spectate();
+    public void spectateGame() {
+//        client.spectateGame();
     }
 
-    public void disconnect() {
-        client.disconnect();
+    public void joinGame() {
+        client.joinGame(game.getPlayerX(), game.getPlayerY());
+    }
+
+    public void disconnectServer() {
+        client.disconnectServer();
+    }
+
+    private void enterName() {
+        String newName = JOptionPane.showInputDialog("Enter player's name");
+        if (! newName.isEmpty()) {
+            name = newName;
+        }
     }
 }

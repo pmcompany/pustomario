@@ -8,10 +8,10 @@ public enum PackageType {
     CONNECT, SPECTATE, JOIN, DISCONNECT, GAME_EVENT,
 
     // Server responses
-    CONNECTED,
+    CONNECTED, SPECTATED, JOINED,
 
     // Default response
-    OK;
+    REJECTED, OK;
 
     public int getValue() {
         return ordinal();

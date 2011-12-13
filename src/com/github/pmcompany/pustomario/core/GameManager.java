@@ -10,7 +10,8 @@ public interface GameManager {
     public boolean isDebugMode();
 
     public String getName();
-    public void connect();
-    public void spectate();
-    public void disconnect();
+    public void connectServer();
+    public void spectateGame();
+    public void joinGame();
+    public void disconnectServer();
 }

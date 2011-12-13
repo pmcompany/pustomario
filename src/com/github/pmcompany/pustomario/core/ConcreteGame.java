@@ -85,6 +85,13 @@ public class ConcreteGame implements EventHandler, DataProvider {
                     player.setCanJump(false);
                 }
             } break;
+
+            case SET_PLAYER_X: {
+                player.setX(e.getIntValue());
+            } break;
+            case SET_PLAYER_Y: {
+                player.setY(e.getIntValue());
+            } break;
         }
     }
 
