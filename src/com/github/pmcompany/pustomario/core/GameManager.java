@@ -11,7 +11,7 @@ public interface GameManager {
 
     public String getName();
     public void connectServer();
-    public void spectateGame();
-    public void joinGame();
+//    public void spectateGame();
+//    public void joinGame();
     public void disconnectServer();
 }

@@ -13,10 +13,10 @@ public class ServerThread extends Thread {
     private Socket s;
     private String name;
     private DataProvider game;
-    private EventHandler server;
+    private TestServer server;
     private boolean joined;
 
-    public ServerThread(Socket s, EventHandler server, DataProvider game) {
+    public ServerThread(Socket s, TestServer server, DataProvider game) {
         this.s = s;
         this.game = game;
         this.server = server;
@@ -63,20 +63,21 @@ public class ServerThread extends Thread {
                             if (joined) {
                                 System.out.println("Trying to handle " + p + " from " + name);
                                 response = NetworkPackage.DEFAULT_PACKAGE;
-//                                server.handleEvent(GameEventp.getValue());
+                                server.handleEvent(new GameEvent(EventType.valueOf(p.getValue()), null));
                             } else {
                                 response = NetworkPackage.REJECTED_PACKAGE;
                             }
                         } break;
 
-//                        case SPECTATE: {
-//                            int x = game.getPlayerX();
-//                            int y = game.getPlayerY();
-//
-//                            response = new NetworkPackage(PackageType.SPECTATED,
-//                                    String.format("%d %d", x, y));
-//
-//                        } break;
+                        case SPECTATE: {
+                            int x = game.getPlayerX();
+                            int y = game.getPlayerY();
+
+                            response = new NetworkPackage(PackageType.SPECTATED,
+                                    String.format("%d %d", x, y));
+
+                            joined = false;
+                        } break;
 
                         default: {
                             response = NetworkPackage.DEFAULT_PACKAGE;

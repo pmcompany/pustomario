@@ -6,9 +6,7 @@ import com.github.pmcompany.pustomario.io.LWJGLComplex;
 import com.github.pmcompany.pustomario.io.OutputHandler;
 import com.github.pmcompany.pustomario.io.OutputServer;
 import com.github.pmcompany.pustomario.io.View;
-import com.github.pmcompany.pustomario.net.ConcreteNetworkClient;
-import com.github.pmcompany.pustomario.net.Network;
-import com.github.pmcompany.pustomario.net.NetworkClient;
+import com.github.pmcompany.pustomario.net.*;
 
 import javax.swing.*;
 
@@ -25,28 +23,21 @@ public class Client implements Runnable, GameManager, OutputServer {
     private boolean turnOff;
 
     private String name;
-    private NetworkClient client;
+    private NetworkClient clientNetwork;
 
     public Client() {
         // Create components
         game = new ConcreteGame();
         lwjgl = new LWJGLComplex(this, game, View.SCREEN_WIDTH, View.SCREEN_HEIGHT);
-//        preprocessor = new Preprocessor();
 
         // Configure components
         lwjgl.setTitle(GAME_TITLE);
 
         // Link components
         lwjgl.addEventHandler(game);
-//        preprocessor.addEventHandler(game);
 
         // Managed states initial value
         turnOff = false;
-
-        client = new ConcreteNetworkClient(this, Network.HOST, Network.PORT);
-        client.start();
-
-        lwjgl.addEventHandler(client);
     }
 
     public void run() {
@@ -98,23 +89,37 @@ public class Client implements Runnable, GameManager, OutputServer {
     }
 
     public void connectServer() {
-        if (name == null) {
-            enterName();
+        if (clientNetwork == null) {
+            clientNetwork = new ConcreteNetworkClient(this, Network.HOST, Network.PORT);
         }
 
-        client.conectServer();
+        if(! clientNetwork.isConnected()) {
+            if (name == null) {
+                enterName();
+            }
+
+            clientNetwork.connectServer();
+
+            lwjgl.addEventHandler(clientNetwork.getNetworkSender());
+            clientNetwork.getNetworkReceiver().addEventHandler(game);
+        }
     }
 
-    public void spectateGame() {
-//        client.spectateGame();
-    }
-
-    public void joinGame() {
-        client.joinGame(game.getPlayerX(), game.getPlayerY());
-    }
+//    public void spectateGame() {
+////        clientNetwork.spectateGame();
+//    }
+//
+//    public void joinGame() {
+//        clientNetwork.joinGame(game.getPlayerX(), game.getPlayerY());
+//    }
 
     public void disconnectServer() {
-        client.disconnectServer();
+        if (clientNetwork != null && clientNetwork.isConnected()) {
+            clientNetwork.disconnectServer();
+
+            lwjgl.removeEventHandler(clientNetwork.getNetworkSender());
+            clientNetwork.getNetworkReceiver().removeEventHandler(game);
+        }
     }
 
     private void enterName() {
