@@ -11,7 +11,7 @@ import java.io.PrintWriter;
 /**
  * @author dector (dector9@gmail.com)
  */
-public class NetworkSender extends Thread implements EventHandler {
+public abstract class NetworkSender extends Thread implements EventHandler {
     private PrintWriter out;
     private Connection connection;
 

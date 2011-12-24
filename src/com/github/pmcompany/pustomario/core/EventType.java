@@ -9,5 +9,5 @@ public enum EventType {
     RUN_LEFT, RUN_RIGHT, JUMP,
 
     // Service events
-    SET_PLAYER_X, SET_PLAYER_Y
+    BORN, ADD_NEW_PLAYER, SET_PLAYER_X, SET_PLAYER_Y
 }

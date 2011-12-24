@@ -1,17 +1,18 @@
-package com.github.pmcompany.pustomario.net;
+package com.github.pmcompany.pustomario.net.client;
 
-import com.github.pmcompany.pustomario.NetworkImpl;
 import com.github.pmcompany.pustomario.core.*;
+import com.github.pmcompany.pustomario.net.*;
+import com.github.pmcompany.pustomario.net.client.ClientNetworkReceiver;
+import com.github.pmcompany.pustomario.net.client.ClientNetworkSender;
+import com.github.pmcompany.pustomario.net.client.NetworkClient;
 
 import java.io.*;
-import java.net.Socket;
 
 /**
  * @author dector (dector9@gmail.com)
  */
 public class ConcreteNetworkClient implements NetworkClient {
     private GameManager gmanager;
-    private EventHandler handler;
 
     private NetworkImpl network;
     private String host;
@@ -35,18 +36,18 @@ public class ConcreteNetworkClient implements NetworkClient {
         try {
             network = new NetworkImpl(host, port);
 
-            receiver = new NetworkReceiver(this, network.getInputStream());
-            receiver.start();
-
-            sender = new NetworkSender(this, network.getOutputStream());
+            sender = new ClientNetworkSender(this, network.getOutputStream());
             sender.start();
+
+            System.out.printf("Connected to %s:%d%n", host, port);
+            connected = true;
+
+            receiver = new ClientNetworkReceiver(this, network.getInputStream());
+            receiver.start();
         } catch (IOException e) {
             System.out.printf("Can't connectServer to %s:%d%n", host, port);
             e.printStackTrace();
         }
-
-        System.out.printf("Connected to %s:%d%n", host, port);
-        connected = true;
 
         try {
             sender.send(new NetworkPackage(PackageType.CONNECT, gmanager.getName()));

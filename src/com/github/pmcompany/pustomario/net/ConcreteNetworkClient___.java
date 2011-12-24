@@ -1,27 +1,29 @@
 package com.github.pmcompany.pustomario.net;
 
-import com.github.pmcompany.pustomario.core.*;
+import com.github.pmcompany.pustomario.core.Event;
+import com.github.pmcompany.pustomario.core.EventHandler;
+import com.github.pmcompany.pustomario.core.GameManager;
+import com.github.pmcompany.pustomario.net.client.NetworkClient;
 
 import java.io.*;
-import java.net.Socket;
 
 /**
  * @author dector (dector9@gmail.com)
  */
-public class ConcreteNetworkServer extends Thread implements NetworkServer {
+public class ConcreteNetworkClient___ extends Thread implements NetworkClient {
     private GameManager gmanager;
     private EventHandler handler;
 
+    private NetworkImpl network;
     private String host;
     private int port;
 
-    private Socket s;
     private BufferedReader in;
     private PrintWriter out;
     private boolean connected;
     private boolean joined;
 
-    public ConcreteNetworkServer(GameManager gmanager, String host, int port) {
+    public ConcreteNetworkClient___(GameManager gmanager, String host, int port) {
         this.gmanager = gmanager;
         this.host = host;
         this.port = port;
@@ -65,14 +67,16 @@ public class ConcreteNetworkServer extends Thread implements NetworkServer {
         return result;
     }
 
-    public void conectServer() {
+    public void connectServer() {
         System.out.printf("Connecting with %s:%d ...%n", host, port);
 
         try {
-            s = new Socket(host, port);
+            network = new NetworkImpl(host, port);
 
-            in = new BufferedReader(new InputStreamReader(s.getInputStream()));
-            out = new PrintWriter(new OutputStreamWriter(s.getOutputStream()), true);
+
+
+            in = new BufferedReader(new InputStreamReader(network.getInputStream()));
+            out = new PrintWriter(new OutputStreamWriter(network.getOutputStream()), true);
         } catch (IOException e) {
             System.out.printf("Can't connectServer to %s:%d%n", host, port);
             e.printStackTrace();
@@ -138,7 +142,7 @@ public class ConcreteNetworkServer extends Thread implements NetworkServer {
     public void disconnectServer() {
         if (isConnected()) {
             try {
-                s.close();
+                network.close();
                 in.close();
                 out.close();
 
@@ -160,7 +164,13 @@ public class ConcreteNetworkServer extends Thread implements NetworkServer {
         return joined;
     }
 
-    public void disconnect() {
+    // ========================================
 
+    public NetworkReceiver getNetworkReceiver() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    public NetworkSender getNetworkSender() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

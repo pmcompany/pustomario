@@ -8,7 +8,7 @@ public enum PackageType {
     CONNECT, SPECTATE, JOIN, DISCONNECT, GAME_EVENT,
 
     // Server responses
-    CONNECTED, SPECTATED, JOINED,
+    CONNECTED, NAME_EXISTS, SPECTATED, JOINED,
 
     // Default response
     REJECTED, OK;

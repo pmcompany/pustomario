@@ -7,6 +7,8 @@ import com.github.pmcompany.pustomario.io.OutputHandler;
 import com.github.pmcompany.pustomario.io.OutputServer;
 import com.github.pmcompany.pustomario.io.View;
 import com.github.pmcompany.pustomario.net.*;
+import com.github.pmcompany.pustomario.net.client.ConcreteNetworkClient;
+import com.github.pmcompany.pustomario.net.client.NetworkClient;
 
 import javax.swing.*;
 
@@ -100,7 +102,7 @@ public class Client implements Runnable, GameManager, OutputServer {
 
             clientNetwork.connectServer();
 
-            lwjgl.addEventHandler(clientNetwork.getNetworkSender());
+//            lwjgl.addEventHandler(clientNetwork.getNetworkSender());
             clientNetwork.getNetworkReceiver().addEventHandler(game);
         }
     }

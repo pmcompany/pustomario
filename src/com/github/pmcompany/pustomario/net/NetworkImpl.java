@@ -1,4 +1,4 @@
-package com.github.pmcompany.pustomario;
+package com.github.pmcompany.pustomario.net;
 
 import com.github.pmcompany.pustomario.net.Network;
 

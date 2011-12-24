@@ -1,9 +1,10 @@
-package com.github.pmcompany.pustomario.net;
+package com.github.pmcompany.pustomario;
 
 import com.github.pmcompany.pustomario.core.*;
+import com.github.pmcompany.pustomario.net.NetworkPackage;
+import com.github.pmcompany.pustomario.net.PackageType;
 
 import java.io.*;
-import java.net.ServerSocket;
 import java.net.Socket;
 
 /**
