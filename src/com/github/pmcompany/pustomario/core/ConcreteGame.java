@@ -59,8 +59,10 @@ public class ConcreteGame implements EventHandler, DataProvider, EventServer {
                     if (tile == '#') {
                         map.setAt(i, j, levelLine.charAt(i-1));
                     } else if (tile == '@') {
-                        currentPlayer = new Player((i-1) * View.TILE_WIDTH + 1,
-                                (j-1) * View.TILE_HEIGHT + 1);
+                        if (playerName != null) {
+                            currentPlayer = new Player((i-1) * View.TILE_WIDTH + 1,
+                                    (j-1) * View.TILE_HEIGHT + 1);
+                        }
                     }
                 }
             }
@@ -463,5 +465,9 @@ public class ConcreteGame implements EventHandler, DataProvider, EventServer {
 
     public Player getPlayerByName(String name) {
         return players.get(name);
+    }
+
+    public void removeMainPlayer() {
+        players.remove(currentPlayer.getName());
     }
 }

@@ -1,6 +1,8 @@
 package com.github.pmcompany.pustomario;
 
 import com.github.pmcompany.pustomario.core.ConcreteGame;
+import com.github.pmcompany.pustomario.core.EventType;
+import com.github.pmcompany.pustomario.core.GameEvent;
 import com.github.pmcompany.pustomario.core.Player;
 import com.github.pmcompany.pustomario.net.*;
 import com.github.pmcompany.pustomario.net.server.ConcreteNetworkServer;
@@ -10,6 +12,7 @@ import com.github.pmcompany.pustomario.net.server.NetworkServer;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -43,6 +46,7 @@ public class Server implements Runnable, NetClientsController {
 
     public void run() {
         game.initGame();
+        game.removeMainPlayer();
 
         Socket s;
         while (! turnOff) {
@@ -88,6 +92,25 @@ public class Server implements Runnable, NetClientsController {
     }
 
     public void joinClient(String name, int x, int y, NetworkServer newNetworkServer) {
+        NetworkSender sender = newNetworkServer.getNetworkSender();
+
+        NetworkPackage pack;
+        Player player;
+        Iterator<Player> playersIter = game.getPlayersIterator();
+        while (playersIter.hasNext()) {
+            player = playersIter.next();
+
+            pack = new NetworkPackage(PackageType.GAME_EVENT, player.getName(),
+                    new GameEvent(EventType.JOIN_NEW_PLAYER, player.getName(),
+                            String.format("%d %d", player.getX(), player.getY())));
+            try {
+                sender.send(pack);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+
         game.addPlayer(name, x, y);
     }
 
