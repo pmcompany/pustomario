@@ -248,7 +248,7 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
             int pRelativeX = realPx - px;
             int pRelativeY = realPy - py;
 
-            List<Point> crossedTiles = game.getPlayerCrossedTiles();
+            List<Point> crossedTiles = game.getPlayerCrossedTiles(game.getPlayer());
             for (int i = 0; i < crossedTiles.size(); i++) {
                 tileP = crossedTiles.get(i);
                 absTileStartP = game.countAbsByTile(tileP.getX(), tileP.getY());
@@ -279,7 +279,7 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
                 }
             }
 
-            List<Point> neighTiles = game.getPlayerNeighbourTiles(direction);
+            List<Point> neighTiles = game.getPlayerNeighbourTiles(game.getPlayer(), direction);
             for (Point neighTile : neighTiles) {
                 absTileStartP = game.countAbsByTile(neighTile.getX(), neighTile.getY());
 

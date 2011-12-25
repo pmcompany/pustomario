@@ -27,11 +27,13 @@ public interface DataProvider {
     public float getPlayerSpeedY(String name);
     public boolean isPlayerWatchingRight(String name);
 
-    public List<Point> getPlayerCrossedTiles();
-    public List<Point> getPlayerNeighbourTiles(int direction);
+    public List<Point> getPlayerCrossedTiles(Player currentPlayer);
+    public List<Point> getPlayerNeighbourTiles(Player currentPlayer, int direction);
 
     public int getMapWidth();
     public int getMapHeight();
 
     public int getPlayersNum();
+
+    public Player getPlayer();
 }

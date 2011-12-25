@@ -77,12 +77,18 @@ public class ConcreteGame implements EventHandler, DataProvider {
     }
 
     public void handleEvent(Event e) {
+
         Player p;
         if (e.getStringValue().equals(getPlayerName())) {
             p = currentPlayer;
         } else {
             p = players.get(e.getSender());
         }
+
+        if (p != null) {
+            System.out.printf("Handling event from %s %n", p.getName());
+        }
+
         switch (e.getType()) {
 //            case ACCELERATE_X_PLAYER: {
 //                p.accelerateX(e.getFloatValue() * Physics.RUN_ACCELERATION_COEFFICIENT);
@@ -179,7 +185,9 @@ public class ConcreteGame implements EventHandler, DataProvider {
         // Count dynamic objects position,
         // using physical laws and time value
 
-        movePlayer();
+        for (Player p : players.values()) {
+            movePlayer(p);
+        }
 
         updateTime = currTime;
     }
@@ -189,7 +197,7 @@ public class ConcreteGame implements EventHandler, DataProvider {
 //        currentPlayer.setSpeedY(0);
     }
 
-    private void movePlayer() {
+    private void movePlayer(Player currentPlayer) {
         currentPlayer.accelerateY(Physics.GRAVITY_ACCELERATION);
         currentPlayer.setSpeedX(currentPlayer.getSpeedX() * Physics.GROUND_ONE_ON_FRICTION);
 
@@ -206,7 +214,7 @@ public class ConcreteGame implements EventHandler, DataProvider {
 
         if (speedX != 0) {
             currentPlayer.setX(px + (int) speedX);
-            crossedTiles = getPlayerCrossedTiles();
+            crossedTiles = getPlayerCrossedTiles(currentPlayer);
 
             for (int i = 0; i < crossedTiles.size() && (! crosses); i++) {
                 newCrossedTile = crossedTiles.get(i);
@@ -226,7 +234,7 @@ public class ConcreteGame implements EventHandler, DataProvider {
 
         if (speedY != 0) {
             currentPlayer.setY(py + (int) speedY);
-            crossedTiles = getPlayerCrossedTiles();
+            crossedTiles = getPlayerCrossedTiles(currentPlayer);
 
             for (int i = 0; i < crossedTiles.size() && (! crosses); i++) {
                 newCrossedTile = crossedTiles.get(i);
@@ -247,7 +255,7 @@ public class ConcreteGame implements EventHandler, DataProvider {
         }
     }
 
-    public List<Point> getPlayerCrossedTiles() {
+    public List<Point> getPlayerCrossedTiles(Player currentPlayer) {
         List<Point> tilesList = new LinkedList<Point>();
 
         int px = currentPlayer.getX();
@@ -295,10 +303,10 @@ public class ConcreteGame implements EventHandler, DataProvider {
      *         V
      *         4
      */
-    public List<Point> getPlayerNeighbourTiles(int direction) {
+    public List<Point> getPlayerNeighbourTiles(Player currentPlayer, int direction) {
         List<Point> points = new LinkedList<Point>();
 
-        List<Point> crossedTiles = getPlayerCrossedTiles();
+        List<Point> crossedTiles = getPlayerCrossedTiles(currentPlayer);
 
         int lx;
         int ly;
@@ -411,5 +419,9 @@ public class ConcreteGame implements EventHandler, DataProvider {
 
     public int getPlayersNum() {
         return players.size();
+    }
+
+    public Player getPlayer() {
+        return currentPlayer;
     }
 }
