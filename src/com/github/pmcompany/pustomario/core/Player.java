@@ -9,6 +9,8 @@ public class Player {
     private String name;
     private int x;
     private int y;
+    private int prevX;
+    private int prevY;
 
     private int hp = 100;
 
@@ -104,5 +106,25 @@ public class Player {
 
     public void setHp(int hp) {
         this.hp = hp;
+    }
+
+    public int getPrevX() {
+        return prevX;
+    }
+
+    public void setPrevX(int prevX) {
+        this.prevX = prevX;
+    }
+
+    public int getPrevY() {
+        return prevY;
+    }
+
+    public void setPrevY(int prevY) {
+        this.prevY = prevY;
+    }
+
+    public boolean moved() {
+        return (getPrevX() != getX()) || (getPrevY() != getY());
     }
 }

@@ -105,6 +105,14 @@ public class ConcreteNetworkServer implements NetworkServer, Connection, EventHa
                     e1.printStackTrace();
                 }
             } break;
+
+            case MOVE_PLAYER: {
+                String[] pos = e.getStringValue().split(" ");
+                int x = Integer.parseInt(pos[0]);
+                int y = Integer.parseInt(pos[1]);
+
+                controller.setClientPos(e.getSender(), x, y);
+            } break;
         }
     }
 

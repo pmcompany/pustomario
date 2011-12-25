@@ -95,6 +95,8 @@ public class Client implements Runnable, GameManager, OutputServer {
 
             clientNetwork.connectServer();
 
+            game.addEventHandler(clientNetwork.getNetworkSender());
+
 //            lwjgl.addEventHandler(clientNetwork.getNetworkSender());
             clientNetwork.getNetworkReceiver().addEventHandler(game);
         }
@@ -118,6 +120,8 @@ public class Client implements Runnable, GameManager, OutputServer {
 
             lwjgl.removeEventHandler(clientNetwork.getNetworkSender());
             clientNetwork.getNetworkReceiver().removeEventHandler(game);
+
+            game.removeEventHandler(clientNetwork.getNetworkSender());
         }
     }
 

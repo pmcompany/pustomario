@@ -27,10 +27,11 @@ public class ServerNetworkReceiver extends NetworkReceiver {
         switch (p.getType()) {
             case GAME_EVENT: {
                 String subStr = value.substring(value.indexOf(' ') + 1, value.length());
-                value = subStr.substring(0, subStr.indexOf(' '));
+                String type = subStr.substring(0, subStr.indexOf(' '));
+                value = subStr.substring(subStr.indexOf(' ') + 1, subStr.length());
 
                 GameEvent e =
-                        new GameEvent(EventType.valueOf(value), p.getSender(), null);
+                        new GameEvent(EventType.valueOf(type), p.getSender(), value);
 
                 handleEvent(e);
             } break;

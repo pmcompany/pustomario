@@ -1,6 +1,7 @@
 package com.github.pmcompany.pustomario;
 
 import com.github.pmcompany.pustomario.core.ConcreteGame;
+import com.github.pmcompany.pustomario.core.Player;
 import com.github.pmcompany.pustomario.net.*;
 import com.github.pmcompany.pustomario.net.server.ConcreteNetworkServer;
 import com.github.pmcompany.pustomario.net.server.NetClientsController;
@@ -136,5 +137,14 @@ public class Server implements Runnable, NetClientsController {
     public static void main(String[] args) {
         Server s = new Server();
         s.run();
+    }
+
+    public void setClientPos(String name, int x, int y) {
+        Player p = game.getPlayerByName(name);
+
+        if (p != null) {
+            p.setX(x);
+            p.setY(y);
+        }
     }
 }

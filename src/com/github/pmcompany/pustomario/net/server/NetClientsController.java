@@ -12,4 +12,6 @@ public interface NetClientsController {
     public void removeClient(String name);
     public boolean hasClient(String name);
     public String getClientName(NetworkServer server);
+
+    public void setClientPos(String name, int x, int y);
 }

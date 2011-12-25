@@ -16,12 +16,14 @@ import static com.github.pmcompany.pustomario.core.VectorDirection.*;
 /**
  * @author dector (dector9@gmail.com)
  */
-public class ConcreteGame implements EventHandler, DataProvider {
+public class ConcreteGame implements EventHandler, DataProvider, EventServer {
     private Map map;
     private java.util.Map<String, Player> players;
 
     private String playerName;
     private Player currentPlayer;
+
+    private List<EventHandler> handlers;
 
     private long updateTime;
 
@@ -29,6 +31,7 @@ public class ConcreteGame implements EventHandler, DataProvider {
         this.playerName = playerName;
 
         players = new LinkedHashMap<String, Player>();
+        handlers = new LinkedList<EventHandler>();
     }
 
     public void initGame() {
@@ -77,7 +80,6 @@ public class ConcreteGame implements EventHandler, DataProvider {
     }
 
     public void handleEvent(Event e) {
-
         Player p;
         if (e.getStringValue().equals(getPlayerName())) {
             p = currentPlayer;
@@ -119,6 +121,17 @@ public class ConcreteGame implements EventHandler, DataProvider {
                 newPlayer.setName(e.getSender());
 
                 players.put(newPlayer.getName(), newPlayer);
+            } break;
+
+            case MOVE_PLAYER: {
+                if (p != currentPlayer && p != null) {
+                    String[] pos = e.getStringValue().split(" ");
+                    int x = Integer.parseInt(pos[0]);
+                    int y = Integer.parseInt(pos[1]);
+
+                    p.setX(x);
+                    p.setY(y);
+                }
             } break;
 
 //            case SET_PLAYER_X: {
@@ -187,6 +200,16 @@ public class ConcreteGame implements EventHandler, DataProvider {
 
         for (Player p : players.values()) {
             movePlayer(p);
+
+            if (p == currentPlayer && p.moved()) {
+                System.out.printf("%b X %d->%d Y %d->%d%n", p.moved(), p.getPrevX(), p.getX(),
+                        p.getPrevY(), p.getY());
+
+                for (EventHandler h : handlers) {
+                    h.handleEvent(new GameEvent(EventType.MOVE_PLAYER, currentPlayer.getName(),
+                            String.format("%d %d", currentPlayer.getX(), currentPlayer.getY())));
+                }
+            }
         }
 
         updateTime = currTime;
@@ -207,6 +230,11 @@ public class ConcreteGame implements EventHandler, DataProvider {
         float speedY = currentPlayer.getSpeedY();
 
         // Move currentPlayer
+
+        if (currentPlayer == this.currentPlayer) {
+            currentPlayer.setPrevX(px);
+            currentPlayer.setPrevY(py);
+        }
 
         Point newCrossedTile = null;
         List<Point> crossedTiles;
@@ -423,5 +451,17 @@ public class ConcreteGame implements EventHandler, DataProvider {
 
     public Player getPlayer() {
         return currentPlayer;
+    }
+
+    public void addEventHandler(EventHandler handler) {
+        handlers.add(handler);
+    }
+
+    public void removeEventHandler(EventHandler handler) {
+        handlers.remove(handler);
+    }
+
+    public Player getPlayerByName(String name) {
+        return players.get(name);
     }
 }
