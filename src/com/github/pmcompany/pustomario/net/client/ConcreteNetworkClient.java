@@ -57,6 +57,16 @@ public class ConcreteNetworkClient implements NetworkClient {
         }
     }
 
+    public void joinGame(String name, int x, int y) {
+        if (isConnected()) {
+            try {
+                sender.send(new NetworkPackage(PackageType.JOIN, String.format("%s %d %d", name, x, y)));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
     public void disconnectServer() {
         if (isConnected()) {
             try {
@@ -79,11 +89,30 @@ public class ConcreteNetworkClient implements NetworkClient {
         return joined;
     }
 
+    public void setConnected(boolean connected) {
+        this.connected = connected;
+    }
+
+    public void setJoined(boolean joined) {
+        this.joined = joined;
+
+        EventServer eServ = gmanager.getMainEventServer();
+        if (joined) {
+            eServ.addEventHandler(sender);
+        } else {
+            eServ.removeEventHandler(sender);
+        }
+    }
+
     public NetworkSender getNetworkSender() {
         return sender;
     }
 
     public NetworkReceiver getNetworkReceiver() {
         return receiver;
+    }
+
+    public String getUserName() {
+        return gmanager.getName();
     }
 }

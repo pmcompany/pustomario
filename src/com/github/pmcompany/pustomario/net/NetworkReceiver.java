@@ -15,7 +15,7 @@ import java.util.List;
  */
 public abstract class NetworkReceiver extends Thread implements EventServer {
     private BufferedReader in;
-    private Connection connection;
+    public Connection connection;
 
     private List<EventHandler> handlers;
 

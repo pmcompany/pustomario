@@ -39,6 +39,20 @@ public class ServerNetworkReceiver extends NetworkReceiver {
                     handler.handleEvent(e);
                 }
             } break;
+
+            case JOIN: {
+                GameEvent e =
+                        new GameEvent(EventType.JOIN_NEW_PLAYER, p.getValue());
+
+                try {
+                    for (EventHandler handler : getEventHandlers()) {
+                        handler.handleEvent(e);
+                    }
+                } catch (java.util.ConcurrentModificationException e1) {
+                    // Ignore
+                }
+
+            } break;
         }
     }
 }

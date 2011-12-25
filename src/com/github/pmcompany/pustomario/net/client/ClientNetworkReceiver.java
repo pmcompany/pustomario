@@ -7,6 +7,7 @@ import com.github.pmcompany.pustomario.net.Connection;
 import com.github.pmcompany.pustomario.net.NetworkPackage;
 import com.github.pmcompany.pustomario.net.NetworkReceiver;
 
+import javax.swing.*;
 import java.io.InputStream;
 
 /**
@@ -32,6 +33,16 @@ public class ClientNetworkReceiver extends NetworkReceiver {
 
             case CONNECTED: {
                 System.out.println("CONNECTED!");
+            } break;
+
+            case NAME_EXISTS: {
+                JOptionPane.showMessageDialog(null, "Such name exists on server",
+                        "Change name", JOptionPane.ERROR_MESSAGE);
+            } break;
+
+            case JOINED: {
+                System.out.println("Joined to game");
+                connection.setJoined(true);
             } break;
         }
     }

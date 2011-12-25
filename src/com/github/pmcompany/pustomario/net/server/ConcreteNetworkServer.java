@@ -39,7 +39,7 @@ public class ConcreteNetworkServer implements NetworkServer, Connection, EventHa
             // Accept client
             receiver.addEventHandler(this);
             while (! accepted) {}
-            receiver.removeEventHandler(this);
+
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -48,21 +48,42 @@ public class ConcreteNetworkServer implements NetworkServer, Connection, EventHa
     public void handleEvent(Event e) {
         System.out.printf("NetworkServer handling event : %s%n", e.toString());
 
-        if (e.getType() == EventType.ADD_NEW_PLAYER) {
-            String name = e.getStringValue();
+        switch (e.getType()) {
+            case ADD_NEW_PLAYER: {
+                String name = e.getStringValue();
 
-            if (! controller.hasClient(name)) {
-                controller.addNewClient(name, this);
-                accepted = true;
+                if (! controller.hasClient(name)) {
+                    accepted = true;
+                    controller.addNewClient(name, this);
 
-                try {
-                    sender.send(new NetworkPackage(PackageType.CONNECTED, null));
-                } catch (IOException e1) {
-                    e1.printStackTrace();
+                    try {
+                        sender.send(new NetworkPackage(PackageType.CONNECTED, null));
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
+                } else {
+                    try {
+                        sender.send(new NetworkPackage(PackageType.NAME_EXISTS, null));
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
                 }
-            } else {
+
+            } break;
+
+            case JOIN_NEW_PLAYER: {
+                String[] playerInfo = e.getStringValue().split(" ");
+                int x = Integer.parseInt(playerInfo[1]);
+                int y = Integer.parseInt(playerInfo[2]);
+
+                System.out.println("Joining bew player " + playerInfo[0]);
+
+                controller.joinClient(playerInfo[0], x, y, this);
+
                 try {
-                    sender.send(new NetworkPackage(PackageType.NAME_EXISTS, null));
+                    sender.send(new NetworkPackage(PackageType.JOINED, null));
+
+                    receiver.removeEventHandler(this);
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
@@ -99,5 +120,17 @@ public class ConcreteNetworkServer implements NetworkServer, Connection, EventHa
 
     public NetworkSender getNetworkSender() {
         return sender;
+    }
+
+    public void setConnected(boolean connected) {
+        this.connected = connected;
+    }
+
+    public void setJoined(boolean joined) {
+        this.joined = joined;
+    }
+
+    public String getUserName() {
+        return controller.getClientName(this);
     }
 }

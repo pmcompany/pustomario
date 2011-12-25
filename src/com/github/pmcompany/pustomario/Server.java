@@ -27,7 +27,7 @@ public class Server implements Runnable, NetClientsController {
 
     public Server() {
         // Create components
-        game = new ConcreteGame();
+        game = new ConcreteGame(null);
         clientMap = new LinkedHashMap<String, NetworkServer>();
 
         try {
@@ -86,6 +86,10 @@ public class Server implements Runnable, NetClientsController {
         clientMap.put(name, newNetworkServer);
     }
 
+    public void joinClient(String name, int x, int y, NetworkServer newNetworkServer) {
+        game.addPlayer(name, x, y);
+    }
+
     public void removeClient(String name) {
         if (hasClient(name)) {
             NetworkServer nsToRemove = clientMap.get(name);
@@ -103,6 +107,19 @@ public class Server implements Runnable, NetClientsController {
 
     public boolean hasClient(String name) {
         return clientMap.containsKey(name);
+    }
+
+    public String getClientName(NetworkServer server) {
+        String name = null;
+
+        for (String clientName : clientMap.keySet()) {
+            if (clientMap.get(clientName).equals(server)) {
+                name = clientName;
+                break;
+            }
+        }
+
+        return name;
     }
 
     public static void main(String[] args) {

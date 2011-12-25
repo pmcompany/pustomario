@@ -1,6 +1,7 @@
 package com.github.pmcompany.pustomario;
 
 import com.github.pmcompany.pustomario.core.ConcreteGame;
+import com.github.pmcompany.pustomario.core.EventServer;
 import com.github.pmcompany.pustomario.core.GameManager;
 import com.github.pmcompany.pustomario.io.LWJGLComplex;
 import com.github.pmcompany.pustomario.io.OutputHandler;
@@ -24,12 +25,11 @@ public class Client implements Runnable, GameManager, OutputServer {
     private boolean debug;
     private boolean turnOff;
 
-    private String name;
     private NetworkClient clientNetwork;
 
     public Client() {
         // Create components
-        game = new ConcreteGame();
+        game = new ConcreteGame(enterName());
         lwjgl = new LWJGLComplex(this, game, View.SCREEN_WIDTH, View.SCREEN_HEIGHT);
 
         // Configure components
@@ -82,22 +82,14 @@ public class Client implements Runnable, GameManager, OutputServer {
         return debug;
     }
 
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
     public void connectServer() {
         if (clientNetwork == null) {
             clientNetwork = new ConcreteNetworkClient(this, Network.HOST, Network.PORT);
         }
 
         if(! clientNetwork.isConnected()) {
-            if (name == null) {
-                enterName();
+            if (game.getPlayerName() == null) {
+                changeName();
             }
 
             clientNetwork.connectServer();
@@ -110,10 +102,12 @@ public class Client implements Runnable, GameManager, OutputServer {
 //    public void spectateGame() {
 ////        clientNetwork.spectateGame();
 //    }
-//
-//    public void joinGame() {
-//        clientNetwork.joinGame(game.getPlayerX(), game.getPlayerY());
-//    }
+
+    public void joinGame() {
+        if (clientNetwork != null && clientNetwork.isConnected()) {
+            clientNetwork.joinGame(game.getPlayerName(), game.getPlayerX(), game.getPlayerY());
+        }
+    }
 
     public void disconnectServer() {
         if (clientNetwork != null && clientNetwork.isConnected()) {
@@ -124,10 +118,22 @@ public class Client implements Runnable, GameManager, OutputServer {
         }
     }
 
-    private void enterName() {
-        String newName = JOptionPane.showInputDialog("Enter player's name");
-        if (! newName.isEmpty()) {
-            name = newName;
+    private String enterName() {
+        return JOptionPane.showInputDialog("Enter player's name");
+    }
+
+    public String getName() {
+        return game.getPlayerName();
+    }
+
+    public void changeName() {
+        String name = enterName();
+        if (! name.isEmpty()) {
+            game.setPlayerName(name);
         }
+    }
+
+    public EventServer getMainEventServer() {
+        return lwjgl;
     }
 }

@@ -28,6 +28,8 @@ public abstract class NetworkSender extends Thread implements EventHandler {
                 System.out.println("Network error. Check connection!");
                 e1.printStackTrace();
             }
+        } else {
+            System.out.println("Not connected, not sended");
         }
     }
 

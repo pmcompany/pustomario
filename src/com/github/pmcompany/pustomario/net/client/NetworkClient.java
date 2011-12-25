@@ -12,7 +12,7 @@ import com.github.pmcompany.pustomario.net.NetworkSender;
  */
 public interface NetworkClient extends Connection {
     public void connectServer();
-//    public void joinGame(int x, int y);
+    public void joinGame(String name, int x, int y);
 //    public void spectateGame();
     public void disconnectServer();
     public NetworkReceiver getNetworkReceiver();

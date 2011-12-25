@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -16,11 +17,17 @@ import static com.github.pmcompany.pustomario.core.VectorDirection.*;
  */
 public class ConcreteGame implements EventHandler, DataProvider {
     private Map map;
-    private Player player;
+    private java.util.Map<String, Player> players;
+
+    private String playerName;
+    private Player currentPlayer;
 
     private long updateTime;
 
-    public ConcreteGame() {
+    public ConcreteGame(String playerName) {
+        this.playerName = playerName;
+
+        players = new LinkedHashMap<String, Player>();
     }
 
     public void initGame() {
@@ -48,7 +55,7 @@ public class ConcreteGame implements EventHandler, DataProvider {
                     if (tile == '#') {
                         map.setAt(i, j, levelLine.charAt(i-1));
                     } else if (tile == '@') {
-                        player = new Player((i-1) * View.TILE_WIDTH + 1,
+                        currentPlayer = new Player((i-1) * View.TILE_WIDTH + 1,
                                 (j-1) * View.TILE_HEIGHT + 1);
                     }
                 }
@@ -59,39 +66,54 @@ public class ConcreteGame implements EventHandler, DataProvider {
             e.printStackTrace();
         }
 
-        if (player == null) {
-            player = new Player(1, 1);
+        if (currentPlayer == null) {
+            currentPlayer = new Player(1, 1);
         }
+
+        currentPlayer.setName(playerName);
+
+        players.put(currentPlayer.getName(), currentPlayer);
     }
 
     public void handleEvent(Event e) {
         switch (e.getType()) {
             case ACCELERATE_X_PLAYER: {
-                player.accelerateX(e.getFloatValue() * Physics.RUN_ACCELERATION_COEFFICIENT);
+                currentPlayer.accelerateX(e.getFloatValue() * Physics.RUN_ACCELERATION_COEFFICIENT);
             } break;
             case ACCELERATE_Y_PLAYER: {
-                player.accelerateY(e.getFloatValue());
+                currentPlayer.accelerateY(e.getFloatValue());
             } break;
 
             case RUN_RIGHT: {
-                player.accelerateX(Physics.RUN_SPEED);
+                currentPlayer.accelerateX(Physics.RUN_SPEED);
             } break;
             case RUN_LEFT: {
-                player.accelerateX(-Physics.RUN_SPEED);
+                currentPlayer.accelerateX(-Physics.RUN_SPEED);
             } break;
             case JUMP: {
-                if (player.isCanJump()) {
-                    player.accelerateY(Physics.JUMP_SPEED);
-                    player.setCanJump(false);
+                if (currentPlayer.isCanJump()) {
+                    currentPlayer.accelerateY(Physics.JUMP_SPEED);
+                    currentPlayer.setCanJump(false);
                 }
             } break;
 
-            case SET_PLAYER_X: {
-                player.setX(e.getIntValue());
+            case JOIN_NEW_PLAYER: {
+                String[] playerInfo = e.getStringValue().split(" ");
+                int x = Integer.parseInt(playerInfo[2]);
+                int y = Integer.parseInt(playerInfo[3]);
+
+                Player newPlayer = new Player(x, y);
+                newPlayer.setName(playerInfo[0]);
+
+                players.put(newPlayer.getName(), newPlayer);
             } break;
-            case SET_PLAYER_Y: {
-                player.setY(e.getIntValue());
-            } break;
+
+//            case SET_PLAYER_X: {
+//                currentPlayer.setX(e.getIntValue());
+//            } break;
+//            case SET_PLAYER_Y: {
+//                currentPlayer.setY(e.getIntValue());
+//            } break;
         }
     }
 
@@ -116,19 +138,19 @@ public class ConcreteGame implements EventHandler, DataProvider {
     }
 
     public int getPlayerX() {
-        return player.getX();
+        return currentPlayer.getX();
     }
 
     public int getPlayerY() {
-        return player.getY();
+        return currentPlayer.getY();
     }
 
     public float getPlayerSpeedX() {
-        return player.getSpeedX();
+        return currentPlayer.getSpeedX();
     }
 
     public float getPlayerSpeedY() {
-        return player.getSpeedY();
+        return currentPlayer.getSpeedY();
     }
 
     public int getMapWidth() {
@@ -140,7 +162,7 @@ public class ConcreteGame implements EventHandler, DataProvider {
     }
 
     public boolean isPlayerWatchingRight() {
-        return player.isWatchingRight();
+        return currentPlayer.isWatchingRight();
     }
 
     public void preUpdate() {
@@ -156,27 +178,27 @@ public class ConcreteGame implements EventHandler, DataProvider {
     }
 
     public void postUpdate() {
-//        player.setSpeedX(0);
-//        player.setSpeedY(0);
+//        currentPlayer.setSpeedX(0);
+//        currentPlayer.setSpeedY(0);
     }
 
     private void movePlayer() {
-        player.accelerateY(Physics.GRAVITY_ACCELERATION);
-        player.setSpeedX(player.getSpeedX() * Physics.GROUND_ONE_ON_FRICTION);
+        currentPlayer.accelerateY(Physics.GRAVITY_ACCELERATION);
+        currentPlayer.setSpeedX(currentPlayer.getSpeedX() * Physics.GROUND_ONE_ON_FRICTION);
 
-        int px = player.getX();
-        int py = player.getY();
-        float speedX = player.getSpeedX();
-        float speedY = player.getSpeedY();
+        int px = currentPlayer.getX();
+        int py = currentPlayer.getY();
+        float speedX = currentPlayer.getSpeedX();
+        float speedY = currentPlayer.getSpeedY();
 
-        // Move player
+        // Move currentPlayer
 
         Point newCrossedTile = null;
         List<Point> crossedTiles;
         boolean crosses = false;
 
         if (speedX != 0) {
-            player.setX(px + (int)speedX);
+            currentPlayer.setX(px + (int) speedX);
             crossedTiles = getPlayerCrossedTiles();
 
             for (int i = 0; i < crossedTiles.size() && (! crosses); i++) {
@@ -188,15 +210,15 @@ public class ConcreteGame implements EventHandler, DataProvider {
             }
 
             if (crosses) {
-                player.setX(px);
-                player.setSpeedX(0);
+                currentPlayer.setX(px);
+                currentPlayer.setSpeedX(0);
             }
         }
 
         crosses = false;
 
         if (speedY != 0) {
-            player.setY(py + (int)speedY);
+            currentPlayer.setY(py + (int) speedY);
             crossedTiles = getPlayerCrossedTiles();
 
             for (int i = 0; i < crossedTiles.size() && (! crosses); i++) {
@@ -208,12 +230,12 @@ public class ConcreteGame implements EventHandler, DataProvider {
             }
 
             if (crosses) {
-               player.setY(py);
+               currentPlayer.setY(py);
 
                 if (speedY < 0) {
-                    player.setCanJump(true);
+                    currentPlayer.setCanJump(true);
                 }
-                player.setSpeedY(0);
+                currentPlayer.setSpeedY(0);
             }
         }
     }
@@ -221,8 +243,8 @@ public class ConcreteGame implements EventHandler, DataProvider {
     public List<Point> getPlayerCrossedTiles() {
         List<Point> tilesList = new LinkedList<Point>();
 
-        int px = player.getX();
-        int py = player.getY();
+        int px = currentPlayer.getX();
+        int py = currentPlayer.getY();
 
         int lx = 0;
         int ly = 0;
@@ -323,8 +345,8 @@ public class ConcreteGame implements EventHandler, DataProvider {
 //    private int[][] getPlayerTiles() {
 //        int[][] pTiles = new int[4][2];
 //
-//        int px = player.getX();
-//        int py = player.getY();
+//        int px = currentPlayer.getX();
+//        int py = currentPlayer.getY();
 //        int rx = View.TILE_XRADIUS;
 //        int ry = View.TILE_YRADIUS;
 //
@@ -339,4 +361,40 @@ public class ConcreteGame implements EventHandler, DataProvider {
 //
 //        return pTiles;
 //    }
+
+
+    public int getPlayerX(String name) {
+        return players.get(name).getX();
+    }
+
+    public int getPlayerY(String name) {
+        return players.get(name).getY();
+    }
+
+    public float getPlayerSpeedX(String name) {
+        return players.get(name).getSpeedX();
+    }
+
+    public float getPlayerSpeedY(String name) {
+        return players.get(name).getSpeedY();
+    }
+
+    public boolean isPlayerWatchingRight(String name) {
+        return players.get(name).isWatchingRight();
+    }
+
+    public String getPlayerName() {
+        return currentPlayer.getName();
+    }
+
+    public void setPlayerName(String newName) {
+        currentPlayer.setName(newName);
+    }
+
+    public void addPlayer(String name, int x, int y) {
+        Player p = new Player(x, y);
+        p.setName(name);
+
+        players.put(name, p);
+    }
 }

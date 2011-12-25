@@ -4,6 +4,7 @@ package com.github.pmcompany.pustomario.core;
  * @author dector (dector9@gmail.com)
  */
 public class Player {
+    private String name;
     private int x;
     private int y;
 
@@ -19,6 +20,14 @@ public class Player {
 
         watchingRight = true;
         canJump = true;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public int getX() {
