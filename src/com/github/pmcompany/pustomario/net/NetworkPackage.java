@@ -11,32 +11,44 @@ import java.io.ObjectOutput;
  */
 public class NetworkPackage {
     public static final NetworkPackage DEFAULT_PACKAGE =
-            new NetworkPackage(PackageType.OK, null);
+            new NetworkPackage(PackageType.OK, null, null);
     public static final NetworkPackage SPECTATE_PACKAGE =
-            new NetworkPackage(PackageType.SPECTATE, null);
+            new NetworkPackage(PackageType.SPECTATE, null, null);
     public static final NetworkPackage REJECTED_PACKAGE =
-            new NetworkPackage(PackageType.REJECTED, null);
+            new NetworkPackage(PackageType.REJECTED, null, null);
 
     private PackageType type;
+    private String sender;
     private String value;
 
     public NetworkPackage(String representation) {
         if (representation != null) {
-            int typeIndex = representation.indexOf(' ');
-            type = PackageType.valueOf(representation.substring(0, typeIndex));
-
             int length = representation.length();
+
+            int senderIndex = representation.indexOf(' ');
+            sender = representation.substring(0, senderIndex);
+            String noSenderString = representation.substring(senderIndex + 1, length);
+
+            int typeIndex = noSenderString.indexOf(' ');
+            type = PackageType.valueOf(noSenderString.substring(0, typeIndex));
+
             if (length > typeIndex) {
-                value = representation.substring(typeIndex + 1, length);
+                value = noSenderString.substring(typeIndex + 1, noSenderString.length());
             }
         }
     }
 
-    public NetworkPackage(PackageType type, Object value) {
+    public NetworkPackage(PackageType type, String sender, Object value) {
         this.type = type;
+        this.sender = sender;
+
         if (value != null) {
             this.value = value.toString();
         }
+    }
+
+    public String getSender() {
+        return sender;
     }
 
     public PackageType getType() {
@@ -49,6 +61,6 @@ public class NetworkPackage {
 
     @Override
     public String toString() {
-        return type + " " + value;
+        return sender + " " + type + " " + value;
     }
 }

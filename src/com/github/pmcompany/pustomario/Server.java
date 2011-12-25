@@ -90,6 +90,17 @@ public class Server implements Runnable, NetClientsController {
         game.addPlayer(name, x, y);
     }
 
+    public void spectateClient(String name, NetworkServer networkServer) {
+        NetworkReceiver nr = networkServer.getNetworkReceiver();
+        NetworkSender ns = networkServer.getNetworkSender();
+
+        for (NetworkServer oldNetworkServer : clientMap.values()) {
+            oldNetworkServer.getNetworkReceiver().removeEventHandler(ns);
+        }
+
+        nr.addEventHandler((ConcreteNetworkServer)networkServer);
+    }
+
     public void removeClient(String name) {
         if (hasClient(name)) {
             NetworkServer nsToRemove = clientMap.get(name);

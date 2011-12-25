@@ -8,6 +8,7 @@ import com.github.pmcompany.pustomario.net.server.NetworkServer;
 public interface NetClientsController {
     public void addNewClient(String name, NetworkServer networkServer);
     public void joinClient(String name, int x, int y, NetworkServer networkServer);
+    public void spectateClient(String name, NetworkServer networkServer);
     public void removeClient(String name);
     public boolean hasClient(String name);
     public String getClientName(NetworkServer server);

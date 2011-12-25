@@ -26,7 +26,7 @@ public class ClientNetworkReceiver extends NetworkReceiver {
             case GAME_EVENT: {
                 for (EventHandler handler : getEventHandlers()) {
                     GameEvent e =
-                            new GameEvent(EventType.valueOf(p.getValue()), null);
+                            new GameEvent(EventType.valueOf(p.getValue()), p.getSender(), null);
                     handler.handleEvent(e);
                 }
             } break;
@@ -43,6 +43,11 @@ public class ClientNetworkReceiver extends NetworkReceiver {
             case JOINED: {
                 System.out.println("Joined to game");
                 connection.setJoined(true);
+            } break;
+
+            case SPECTATED: {
+                System.out.println("Spectated to game");
+                connection.setSpectated(true);
             } break;
         }
     }

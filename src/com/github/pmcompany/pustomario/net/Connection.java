@@ -8,5 +8,7 @@ public interface Connection {
     public void setConnected(boolean connected);
     public boolean isJoined();
     public void setJoined(boolean joined);
+    public void setSpectated(boolean spectated);
+    public boolean isSpectated();
     public String getUserName();
 }

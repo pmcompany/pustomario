@@ -12,9 +12,10 @@ public interface GameManager {
     public String getName();
     public void changeName();
     public void connectServer();
-//    public void spectateGame();
+    public void spectateGame();
     public void joinGame();
     public void disconnectServer();
 
     public EventServer getMainEventServer();
+    public EventHandler getMainEventHandler();
 }

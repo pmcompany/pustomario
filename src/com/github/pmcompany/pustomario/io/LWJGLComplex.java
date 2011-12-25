@@ -58,13 +58,13 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
 
     public void checkInput() {
         if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
-            sendEvent(new GameEvent(EventType.RUN_RIGHT, null));
+            sendEvent(new GameEvent(EventType.RUN_RIGHT, gmanager.getName(), null));
         } else if (Keyboard.isKeyDown(Keyboard.KEY_LEFT)) {
-            sendEvent(new GameEvent(EventType.RUN_LEFT, null));
+            sendEvent(new GameEvent(EventType.RUN_LEFT, gmanager.getName(), null));
         }
 
         if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
-            sendEvent(new GameEvent(EventType.JUMP, null));
+            sendEvent(new GameEvent(EventType.JUMP, gmanager.getName(), null));
         }
 
         if (Keyboard.next()) {
@@ -73,7 +73,7 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
                     case Keyboard.KEY_D: gmanager.switchDebugMode(); break;
                     case Keyboard.KEY_F5: gmanager.connectServer(); break;
                     case Keyboard.KEY_F6: gmanager.joinGame(); break;
-//                    case Keyboard.KEY_F8: gmanager.spectateGame(); break;
+                    case Keyboard.KEY_F8: gmanager.spectateGame(); break;
                     case Keyboard.KEY_F9: gmanager.disconnectServer(); break;
                 }
             }

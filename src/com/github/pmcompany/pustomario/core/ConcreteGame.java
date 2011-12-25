@@ -76,34 +76,40 @@ public class ConcreteGame implements EventHandler, DataProvider {
     }
 
     public void handleEvent(Event e) {
+        Player p;
+        if (e.getStringValue().equals(getPlayerName())) {
+            p = currentPlayer;
+        } else {
+            p = players.get(e.getSender());
+        }
         switch (e.getType()) {
-            case ACCELERATE_X_PLAYER: {
-                currentPlayer.accelerateX(e.getFloatValue() * Physics.RUN_ACCELERATION_COEFFICIENT);
-            } break;
-            case ACCELERATE_Y_PLAYER: {
-                currentPlayer.accelerateY(e.getFloatValue());
-            } break;
+//            case ACCELERATE_X_PLAYER: {
+//                p.accelerateX(e.getFloatValue() * Physics.RUN_ACCELERATION_COEFFICIENT);
+//            } break;
+//            case ACCELERATE_Y_PLAYER: {
+//                p.accelerateY(e.getFloatValue());
+//            } break;
 
             case RUN_RIGHT: {
-                currentPlayer.accelerateX(Physics.RUN_SPEED);
+                p.accelerateX(Physics.RUN_SPEED);
             } break;
             case RUN_LEFT: {
-                currentPlayer.accelerateX(-Physics.RUN_SPEED);
+                p.accelerateX(-Physics.RUN_SPEED);
             } break;
             case JUMP: {
-                if (currentPlayer.isCanJump()) {
-                    currentPlayer.accelerateY(Physics.JUMP_SPEED);
-                    currentPlayer.setCanJump(false);
+                if (p.isCanJump()) {
+                    p.accelerateY(Physics.JUMP_SPEED);
+                    p.setCanJump(false);
                 }
             } break;
 
             case JOIN_NEW_PLAYER: {
                 String[] playerInfo = e.getStringValue().split(" ");
-                int x = Integer.parseInt(playerInfo[2]);
-                int y = Integer.parseInt(playerInfo[3]);
+                int x = Integer.parseInt(playerInfo[0]);
+                int y = Integer.parseInt(playerInfo[1]);
 
                 Player newPlayer = new Player(x, y);
-                newPlayer.setName(playerInfo[0]);
+                newPlayer.setName(e.getSender());
 
                 players.put(newPlayer.getName(), newPlayer);
             } break;

@@ -4,12 +4,22 @@ package com.github.pmcompany.pustomario.core;
  * @author dector (dector9@gmail.com)
  */
 public class GameEvent implements Event {
+    private String sender;
     private EventType type;
     private Object value;
 
-    public GameEvent(EventType type, Object value) {
+    public GameEvent(EventType type, String sender, Object value) {
         this.type = type;
+        this.sender = sender;
         this.value = value;
+    }
+
+    public String getSender() {
+        return sender;
+    }
+
+    public void setSender(String sender) {
+        this.sender = sender;
     }
 
     public EventType getType() {
@@ -42,6 +52,6 @@ public class GameEvent implements Event {
 
     @Override
     public String toString() {
-        return type.toString();
+        return sender + " " + type + " " + value;
     }
 }

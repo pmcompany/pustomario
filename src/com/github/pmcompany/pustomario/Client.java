@@ -1,6 +1,7 @@
 package com.github.pmcompany.pustomario;
 
 import com.github.pmcompany.pustomario.core.ConcreteGame;
+import com.github.pmcompany.pustomario.core.EventHandler;
 import com.github.pmcompany.pustomario.core.EventServer;
 import com.github.pmcompany.pustomario.core.GameManager;
 import com.github.pmcompany.pustomario.io.LWJGLComplex;
@@ -99,9 +100,11 @@ public class Client implements Runnable, GameManager, OutputServer {
         }
     }
 
-//    public void spectateGame() {
-////        clientNetwork.spectateGame();
-//    }
+    public void spectateGame() {
+        if (clientNetwork != null && clientNetwork.isConnected()) {
+            clientNetwork.spectateGame(game.getPlayerName());
+        }
+    }
 
     public void joinGame() {
         if (clientNetwork != null && clientNetwork.isConnected()) {
@@ -135,5 +138,9 @@ public class Client implements Runnable, GameManager, OutputServer {
 
     public EventServer getMainEventServer() {
         return lwjgl;
+    }
+
+    public EventHandler getMainEventHandler() {
+        return game;
     }
 }

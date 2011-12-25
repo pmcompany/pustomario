@@ -23,6 +23,7 @@ public class ConcreteNetworkClient implements NetworkClient {
 
     private boolean connected;
     private boolean joined;
+    private boolean spectated;
 
     public ConcreteNetworkClient(GameManager gmanager, String host, int port) {
         this.gmanager = gmanager;
@@ -50,7 +51,7 @@ public class ConcreteNetworkClient implements NetworkClient {
         }
 
         try {
-            sender.send(new NetworkPackage(PackageType.CONNECT, gmanager.getName()));
+            sender.send(new NetworkPackage(PackageType.CONNECT, gmanager.getName(), null));
         } catch (IOException e) {
             System.out.println("Sending name failed");
             e.printStackTrace();
@@ -60,7 +61,18 @@ public class ConcreteNetworkClient implements NetworkClient {
     public void joinGame(String name, int x, int y) {
         if (isConnected()) {
             try {
-                sender.send(new NetworkPackage(PackageType.JOIN, String.format("%s %d %d", name, x, y)));
+                sender.send(new NetworkPackage
+                        (PackageType.JOIN, name, String.format("%d %d", x, y)));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void spectateGame(String name) {
+        if (isConnected()) {
+            try {
+                sender.send(new NetworkPackage(PackageType.SPECTATE, name, null));
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -98,10 +110,27 @@ public class ConcreteNetworkClient implements NetworkClient {
 
         EventServer eServ = gmanager.getMainEventServer();
         if (joined) {
+            setSpectated(false);
             eServ.addEventHandler(sender);
         } else {
             eServ.removeEventHandler(sender);
         }
+    }
+
+    public void setSpectated(boolean spectated) {
+        this.spectated = spectated;
+
+        EventHandler eHndl = gmanager.getMainEventHandler();
+        if (spectated) {
+            setJoined(false);
+            receiver.addEventHandler(eHndl);
+        } else {
+            receiver.removeEventHandler(eHndl);
+        }
+    }
+
+    public boolean isSpectated() {
+        return spectated;
     }
 
     public NetworkSender getNetworkSender() {

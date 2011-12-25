@@ -5,6 +5,7 @@ package com.github.pmcompany.pustomario.core;
  */
 public interface Event {
     public EventType getType();
+    public String getSender();
     public Object getValue();
 
     public String getStringValue();

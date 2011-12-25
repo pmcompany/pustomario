@@ -23,7 +23,7 @@ public abstract class NetworkSender extends Thread implements EventHandler {
     public void handleEvent(Event e) {
         if (connection.isConnected()) {
             try {
-                send(new NetworkPackage(PackageType.GAME_EVENT, e));
+                send(new NetworkPackage(PackageType.GAME_EVENT, e.getSender(), e));
             } catch (IOException e1) {
                 System.out.println("Network error. Check connection!");
                 e1.printStackTrace();

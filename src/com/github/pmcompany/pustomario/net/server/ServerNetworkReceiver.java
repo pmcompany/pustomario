@@ -21,10 +21,15 @@ public class ServerNetworkReceiver extends NetworkReceiver {
     public void processPackage(NetworkPackage p) {
         System.out.printf("Processing package %s%n", p.toString());
 
+        String value = p.getValue();
+
         switch (p.getType()) {
             case GAME_EVENT: {
+                String subStr = value.substring(value.indexOf(' ') + 1, value.length());
+                value = subStr.substring(0, subStr.indexOf(' '));
+
                 GameEvent e =
-                        new GameEvent(EventType.valueOf(p.getValue()), null);
+                        new GameEvent(EventType.valueOf(value), p.getSender(), null);
 
                 for (EventHandler handler : getEventHandlers()) {
                     handler.handleEvent(e);
@@ -33,7 +38,7 @@ public class ServerNetworkReceiver extends NetworkReceiver {
 
             case CONNECT: {
                 GameEvent e =
-                        new GameEvent(EventType.ADD_NEW_PLAYER, p.getValue());
+                        new GameEvent(EventType.ADD_NEW_PLAYER, p.getSender(), value);
 
                 for (EventHandler handler : getEventHandlers()) {
                     handler.handleEvent(e);
@@ -42,7 +47,21 @@ public class ServerNetworkReceiver extends NetworkReceiver {
 
             case JOIN: {
                 GameEvent e =
-                        new GameEvent(EventType.JOIN_NEW_PLAYER, p.getValue());
+                        new GameEvent(EventType.JOIN_NEW_PLAYER, p.getSender(), value);
+
+                try {
+                    for (EventHandler handler : getEventHandlers()) {
+                        handler.handleEvent(e);
+                    }
+                } catch (java.util.ConcurrentModificationException e1) {
+                    // Ignore
+                }
+
+            } break;
+
+            case SPECTATE: {
+                GameEvent e =
+                        new GameEvent(EventType.SPECTATE_PLAYER, p.getSender(), value);
 
                 try {
                     for (EventHandler handler : getEventHandlers()) {
