@@ -6,6 +6,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -402,5 +403,13 @@ public class ConcreteGame implements EventHandler, DataProvider {
         p.setName(name);
 
         players.put(name, p);
+    }
+
+    public Iterator<Player> getPlayersIterator() {
+        return players.values().iterator();
+    }
+
+    public int getPlayersNum() {
+        return players.size();
     }
 }

@@ -1,5 +1,6 @@
 package com.github.pmcompany.pustomario.net.server;
 
+import com.github.pmcompany.pustomario.core.Event;
 import com.github.pmcompany.pustomario.core.EventHandler;
 import com.github.pmcompany.pustomario.core.EventType;
 import com.github.pmcompany.pustomario.core.GameEvent;
@@ -31,28 +32,24 @@ public class ServerNetworkReceiver extends NetworkReceiver {
                 GameEvent e =
                         new GameEvent(EventType.valueOf(value), p.getSender(), null);
 
-                for (EventHandler handler : getEventHandlers()) {
-                    handler.handleEvent(e);
-                }
+                handleEvent(e);
             } break;
 
             case CONNECT: {
                 GameEvent e =
                         new GameEvent(EventType.ADD_NEW_PLAYER, p.getSender(), value);
 
-                for (EventHandler handler : getEventHandlers()) {
-                    handler.handleEvent(e);
-                }
+                handleEvent(e);
             } break;
 
             case JOIN: {
                 GameEvent e =
                         new GameEvent(EventType.JOIN_NEW_PLAYER, p.getSender(), value);
 
+                System.out.println("JOIN NEW PLAYER " + p.getSender() + " " + p.getValue());
+
                 try {
-                    for (EventHandler handler : getEventHandlers()) {
-                        handler.handleEvent(e);
-                    }
+                    handleEvent(e);
                 } catch (java.util.ConcurrentModificationException e1) {
                     // Ignore
                 }
@@ -64,14 +61,22 @@ public class ServerNetworkReceiver extends NetworkReceiver {
                         new GameEvent(EventType.SPECTATE_PLAYER, p.getSender(), value);
 
                 try {
-                    for (EventHandler handler : getEventHandlers()) {
-                        handler.handleEvent(e);
-                    }
+                    handleEvent(e);
                 } catch (java.util.ConcurrentModificationException e1) {
                     // Ignore
                 }
 
             } break;
+        }
+    }
+
+    private void handleEvent(Event e) {
+        EventHandler handler;
+        synchronized (handlers) {
+            for (int i = 0; i < handlers.size(); i++) {
+                handler = handlers.get(i);
+                handler.handleEvent(e);
+            }
         }
     }
 }

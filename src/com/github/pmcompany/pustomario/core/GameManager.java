@@ -9,6 +9,8 @@ public interface GameManager {
     public void switchDebugMode();
     public boolean isDebugMode();
 
+    public void addNewPlayer(String name, int x, int y);
+
     public String getName();
     public void changeName();
     public void connectServer();

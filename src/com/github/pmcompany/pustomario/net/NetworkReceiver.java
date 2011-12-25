@@ -17,7 +17,7 @@ public abstract class NetworkReceiver extends Thread implements EventServer {
     private BufferedReader in;
     public Connection connection;
 
-    private List<EventHandler> handlers;
+    protected List<EventHandler> handlers;
 
     public NetworkReceiver(Connection connection, InputStream in) {
         this.in = new BufferedReader(new InputStreamReader(in));

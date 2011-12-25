@@ -32,7 +32,7 @@ public class NetworkPackage {
             int typeIndex = noSenderString.indexOf(' ');
             type = PackageType.valueOf(noSenderString.substring(0, typeIndex));
 
-            if (length > typeIndex) {
+            if (noSenderString.length() > senderIndex) {
                 value = noSenderString.substring(typeIndex + 1, noSenderString.length());
             }
         }

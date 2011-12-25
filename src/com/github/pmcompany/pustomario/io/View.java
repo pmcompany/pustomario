@@ -15,6 +15,7 @@ public class View {
 
     public static final PColor WALL_COLOR = PColor.BLACK;
     public static final PColor HERO_COLOR = PColor.RED;
+    public static final PColor ALIENT_COLOR = PColor.BLUE;
     public static final PColor EYE_COLOR = PColor.BLACK;
     public static final PColor BACK_COLOR = new PColor(0.3f, 0.3f, 0.3f, 0.3f);
 

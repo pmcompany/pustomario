@@ -143,4 +143,8 @@ public class Client implements Runnable, GameManager, OutputServer {
     public EventHandler getMainEventHandler() {
         return game;
     }
+
+    public void addNewPlayer(String name, int x, int y) {
+        game.addPlayer(name, x, y);
+    }
 }

@@ -22,11 +22,17 @@ public class ClientNetworkReceiver extends NetworkReceiver {
     public void processPackage(NetworkPackage p) {
         System.out.printf("Processing package from server: %s%n", p.toString());
 
+        String value = p.getValue();
+
         switch (p.getType()) {
             case GAME_EVENT: {
+                String subStr = value.substring(value.indexOf(' ') + 1, value.length());
+                String type = subStr.substring(0, subStr.indexOf(' '));
+                value = subStr.substring(subStr.indexOf(' ') + 1, subStr.length());
+
+                GameEvent e =
+                        new GameEvent(EventType.valueOf(type), p.getSender(), value);
                 for (EventHandler handler : getEventHandlers()) {
-                    GameEvent e =
-                            new GameEvent(EventType.valueOf(p.getValue()), p.getSender(), null);
                     handler.handleEvent(e);
                 }
             } break;

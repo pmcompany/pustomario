@@ -1,5 +1,6 @@
 package com.github.pmcompany.pustomario.core;
 
+import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -12,6 +13,7 @@ public interface DataProvider {
     public Point countTileByAbs(int absX, int absY);
     public Point countAbsByTile(int tX, int tY);
 
+    public Iterator<Player> getPlayersIterator();
     public String getPlayerName();
     public int getPlayerX();
     public int getPlayerY();
@@ -30,4 +32,6 @@ public interface DataProvider {
 
     public int getMapWidth();
     public int getMapHeight();
+
+    public int getPlayersNum();
 }

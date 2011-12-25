@@ -11,7 +11,7 @@ import java.io.*;
 /**
  * @author dector (dector9@gmail.com)
  */
-public class ConcreteNetworkClient implements NetworkClient {
+public class ConcreteNetworkClient implements NetworkClient, EventHandler {
     private GameManager gmanager;
 
     private NetworkImpl network;
@@ -44,6 +44,7 @@ public class ConcreteNetworkClient implements NetworkClient {
             connected = true;
 
             receiver = new ClientNetworkReceiver(this, network.getInputStream());
+            receiver.addEventHandler(this);
             receiver.start();
         } catch (IOException e) {
             System.out.printf("Can't connectServer to %s:%d%n", host, port);
@@ -112,6 +113,7 @@ public class ConcreteNetworkClient implements NetworkClient {
         if (joined) {
             setSpectated(false);
             eServ.addEventHandler(sender);
+            receiver.addEventHandler(gmanager.getMainEventHandler());
         } else {
             eServ.removeEventHandler(sender);
         }
@@ -143,5 +145,19 @@ public class ConcreteNetworkClient implements NetworkClient {
 
     public String getUserName() {
         return gmanager.getName();
+    }
+
+    public void handleEvent(Event e) {
+        System.out.println("EVENT " + e);
+
+        switch (e.getType()) {
+            case JOIN_NEW_PLAYER: {
+                String[] values = e.getStringValue().split(" ");
+                int x = Integer.parseInt(values[0]);
+                int y = Integer.parseInt(values[1]);
+
+                gmanager.addNewPlayer(e.getSender(), x, y);
+            } break;
+        }
     }
 }

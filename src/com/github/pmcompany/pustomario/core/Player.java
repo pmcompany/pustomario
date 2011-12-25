@@ -1,5 +1,7 @@
 package com.github.pmcompany.pustomario.core;
 
+import com.github.pmcompany.pustomario.io.PColor;
+
 /**
  * @author dector (dector9@gmail.com)
  */
@@ -7,6 +9,8 @@ public class Player {
     private String name;
     private int x;
     private int y;
+
+    private int hp = 100;
 
     private float speedX;
     private float speedY;
@@ -92,5 +96,13 @@ public class Player {
 
     public void setCanJump(boolean canJump) {
         this.canJump = canJump;
+    }
+
+    public int getHp() {
+        return hp;
+    }
+
+    public void setHp(int hp) {
+        this.hp = hp;
     }
 }

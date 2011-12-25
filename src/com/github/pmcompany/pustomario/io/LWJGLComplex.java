@@ -9,6 +9,7 @@ import org.newdawn.slick.Color;
 import org.newdawn.slick.Font;
 import org.newdawn.slick.TrueTypeFont;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -173,16 +174,59 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
     }
 
     private void drawPlayer() {
+        int realPx = View.SCREEN_WIDTH/2 - 1;
+        int realPy = View.SCREEN_HEIGHT/2 - 1;
+
         int px = game.getPlayerX();
         int py = game.getPlayerY();
 
-        int realPx = View.SCREEN_WIDTH/2 - 1;
-        int realPy = View.SCREEN_HEIGHT/2 - 1;
+        Iterator<Player> players = game.getPlayersIterator();
+        Player p;
+        while (players.hasNext()) {
+            p = players.next();
+
+            if (! p.getName().equals(gmanager.getName())) {
+                int playerX = p.getX();
+                int playerY = p.getY();
+
+                int leftScrX = px - View.SCREEN_WIDTH/2;
+                int leftScrY = py - View.SCREEN_HEIGHT/2;
+                int rightScrX = leftScrX + View.SCREEN_WIDTH;
+                int rightScrY = leftScrY + View.SCREEN_HEIGHT;
+
+                if (leftScrX <= playerX && playerX <= rightScrX
+                        && leftScrY <= playerY && playerY <= rightScrY) {
+                    playerX = realPx - (px - playerX);
+                    playerY = realPy - (py - playerY);
+
+                    drawer.fillRect(playerX, playerY,
+                            View.TILE_WIDTH, View.TILE_HEIGHT, View.ALIENT_COLOR);
+
+                    int eyeX = playerX;
+                    int eyeY = playerY + (int)(0.65f * View.TILE_HEIGHT);
+                    int eyeW = (int)(0.2f * View.TILE_WIDTH);
+                    int eyeH = (int)(0.2f * View.TILE_HEIGHT);
+
+                    if (p.isWatchingRight()) {
+                        eyeX += (int)(0.70f * View.TILE_WIDTH);
+                    } else {
+                        eyeX += (int)(0.25f * View.TILE_WIDTH);
+                    }
+
+                    drawer.fillRect(eyeX-1, eyeY-1, eyeW, eyeH, View.EYE_COLOR);
+
+                    drawer.drawString(playerX - View.TILE_WIDTH/2,
+                            View.SCREEN_HEIGHT - playerY - 2*View.TILE_HEIGHT, p.getName(), textFont, Color.black);
+                }
+            }
+        }
 
 //        drawer.fillRect(view.getScreenStartX() + px-1, view.getScreenStartY() + py-1,
 //                View.TILE_WIDTH, View.TILE_HEIGHT, View.HERO_COLOR);
         drawer.fillRect(realPx, realPy,
                 View.TILE_WIDTH, View.TILE_HEIGHT, View.HERO_COLOR);
+
+        drawer.drawString(realPx - View.TILE_WIDTH/2, realPy - 2*View.TILE_HEIGHT, game.getPlayerName(), textFont, Color.black);
 
         int eyeX = realPx;
         int eyeY = realPy + (int)(0.65f * View.TILE_HEIGHT);
@@ -254,6 +298,7 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
             drawer.drawString(10, 30, String.format("Vx: %.3f\t\t Vy:%.3f", speedX, speedY), textFont, Color.red);
             drawer.drawString(10, 50, String.format("Start screen: %d:%d",
                     view.getScreenStartX(), view.getScreenStartY()), textFont, Color.red);
+            drawer.drawString(10, 70, String.format("Players num %d", game.getPlayersNum()), textFont, Color.red);
 
         }
         // DEBUG END
