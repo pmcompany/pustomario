@@ -17,6 +17,8 @@ import static com.github.pmcompany.pustomario.core.VectorDirection.*;
  * @author dector (dector9@gmail.com)
  */
 public class ConcreteGame implements EventHandler, DataProvider, EventServer {
+    private static final int TRACE_RAY_COEF = 1;
+
     private Map map;
     private java.util.Map<String, Player> players;
 
@@ -114,6 +116,17 @@ public class ConcreteGame implements EventHandler, DataProvider, EventServer {
                 }
             } break;
 
+            case SHOOT: {
+                String[] pos = e.getStringValue().split(" ");
+
+                int sx = Integer.parseInt(pos[0]);
+                int sy = Integer.parseInt(pos[1]);
+
+                Point shootPoint = countShoot(currentPlayer.getPosition(), new Point(sx, sy));
+
+                // Check player near end shoot----------------
+            } break;
+
             case JOIN_NEW_PLAYER: {
                 String[] playerInfo = e.getStringValue().split(" ");
                 int x = Integer.parseInt(playerInfo[0]);
@@ -204,8 +217,8 @@ public class ConcreteGame implements EventHandler, DataProvider, EventServer {
             movePlayer(p);
 
             if (p == currentPlayer && p.moved()) {
-                System.out.printf("%b X %d->%d Y %d->%d%n", p.moved(), p.getPrevX(), p.getX(),
-                        p.getPrevY(), p.getY());
+//                System.out.printf("%b X %d->%d Y %d->%d%n", p.moved(), p.getPrevX(), p.getX(),
+//                        p.getPrevY(), p.getY());
 
                 for (EventHandler h : handlers) {
                     h.handleEvent(new GameEvent(EventType.MOVE_PLAYER, currentPlayer.getName(),
@@ -469,5 +482,49 @@ public class ConcreteGame implements EventHandler, DataProvider, EventServer {
 
     public void removeMainPlayer() {
         players.remove(currentPlayer.getName());
+    }
+
+    public Point countShoot(Point start, Point aim) {
+        boolean done = false;
+
+        double cx = start.getX();
+        double cy = start.getY();
+        int sx = aim.getX();
+        int sy = aim.getY();
+
+        System.out.printf("Counting shoot from %.0f:%.0f to %d:%d%n", cx, cy, sx, sy);
+
+        double c = Math.sqrt(Math.pow(sx - cx, 2) + Math.pow(sy - cy, 2));
+
+        double cosf = (sx - cx) / c;
+        double sinf = (sy - cy) / c;
+
+        Point currTile = countTileByAbs((int)cx, (int)cy);
+        Point prevTile;
+
+        while (! done) {
+            cx += TRACE_RAY_COEF * cosf;
+            cy += TRACE_RAY_COEF * sinf;
+
+            if (0 < cx && cx < getMapWidth() * View.TILE_WIDTH &&
+                    0 < cy && cy < getMapHeight() * View.TILE_HEIGHT) {
+                prevTile = currTile;
+                currTile = countTileByAbs((int)cx, (int)cy);
+
+                if (! currTile.equals(prevTile)) {
+                    if (getTileAt(currTile.getX(), currTile.getY()) == '#') {
+                        done = true;
+                    }
+                }
+            } else {
+                done = true;
+            }
+        }
+
+        return new Point((int)cx, (int)cy);
+    }
+
+    public Point getPlayerPosition() {
+        return currentPlayer.getPosition();
     }
 }

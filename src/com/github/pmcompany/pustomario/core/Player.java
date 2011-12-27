@@ -127,4 +127,8 @@ public class Player {
     public boolean moved() {
         return (getPrevX() != getX()) || (getPrevY() != getY());
     }
+
+    public Point getPosition() {
+        return new Point(getX(), getY());
+    }
 }

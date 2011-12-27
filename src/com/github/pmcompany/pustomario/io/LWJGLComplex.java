@@ -3,12 +3,14 @@ package com.github.pmcompany.pustomario.io;
 import com.github.pmcompany.pustomario.core.*;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.DisplayMode;
 import org.newdawn.slick.Color;
 import org.newdawn.slick.Font;
 import org.newdawn.slick.TrueTypeFont;
 
+import java.security.Key;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -17,6 +19,9 @@ import java.util.List;
  * @author dector (dector9@gmail.com)
  */
 public class LWJGLComplex implements EventServer, InputServer, OutputHandler, GameManagerUser {
+    private static final int SHOOT_TIME = 100;
+    private static final int DRAW_SHOOT_TIME = 100;
+
     private List<EventHandler> handlers;
     private GameManager gmanager;
 
@@ -24,6 +29,17 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
     private DataProvider game;
 
     private View view;
+
+    private int mouseX;
+    private int mouseY;
+
+    private long prevTime;
+    private long delta;
+
+    private boolean shooted;
+    private long lastShootTime;
+    private List<Point[]> shoot;
+    private List<Long> shootTime;
 
     // DEBUG BEGIN
     private Font textFont;
@@ -51,6 +67,16 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
         java.awt.Font font = new java.awt.Font(java.awt.Font.SERIF, java.awt.Font.PLAIN, 14);
         textFont = new TrueTypeFont(font, false);
         // DEBUG END
+
+        shoot = new LinkedList<Point[]>();
+        shootTime = new LinkedList<Long>();
+        updateTime();
+    }
+
+    private void updateTime() {
+        long currTime = System.currentTimeMillis();
+        delta = currTime - prevTime;
+        prevTime = currTime;
     }
 
     public void addInputHandler(InputHandler handler) {}
@@ -58,20 +84,24 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
     public void removeInputHandler(InputHandler handler) {}
 
     public void checkInput() {
-        if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
+        if (Keyboard.isKeyDown(Keyboard.KEY_RIGHT)
+                || Keyboard.isKeyDown(Keyboard.KEY_D)) {
             sendEvent(new GameEvent(EventType.RUN_RIGHT, gmanager.getName(), null));
-        } else if (Keyboard.isKeyDown(Keyboard.KEY_LEFT)) {
+        } else if (Keyboard.isKeyDown(Keyboard.KEY_LEFT)
+                || Keyboard.isKeyDown(Keyboard.KEY_A)) {
             sendEvent(new GameEvent(EventType.RUN_LEFT, gmanager.getName(), null));
         }
 
-        if (Keyboard.isKeyDown(Keyboard.KEY_UP)) {
+        if (Keyboard.isKeyDown(Keyboard.KEY_UP)
+                || Keyboard.isKeyDown(Keyboard.KEY_SPACE)
+                || Keyboard.isKeyDown(Keyboard.KEY_W)) {
             sendEvent(new GameEvent(EventType.JUMP, gmanager.getName(), null));
         }
 
         if (Keyboard.next()) {
             if (Keyboard.getEventKeyState()) {
                 switch (Keyboard.getEventKey()) {
-                    case Keyboard.KEY_D: gmanager.switchDebugMode(); break;
+                    case Keyboard.KEY_F2: gmanager.switchDebugMode(); break;
                     case Keyboard.KEY_F5: gmanager.connectServer(); break;
                     case Keyboard.KEY_F6: gmanager.joinGame(); break;
                     case Keyboard.KEY_F8: gmanager.spectateGame(); break;
@@ -83,6 +113,37 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
         if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
             gmanager.turnOffGame();
         }
+
+        mouseX = Mouse.getX();
+        mouseY = Mouse.getY();
+
+//        System.out.printf("Mouse clicked %d:%d%n", mouseX, mouseY);
+        if (Mouse.isButtonDown(0)) {
+            if (canShoot()) {
+                lastShootTime = prevTime;
+                shooted = true;
+
+                Point playerPos = game.getPlayerPosition();
+                playerPos.setX(playerPos.getX() + View.TILE_WIDTH/2);
+                playerPos.setY(playerPos.getY() + View.TILE_HEIGHT/2);
+
+                int sx = (mouseX - View.SCREEN_WIDTH/2) + playerPos.getX();
+                int sy = (mouseY - View.SCREEN_HEIGHT/2) + playerPos.getY();
+
+                sendEvent(new GameEvent(EventType.SHOOT, gmanager.getName(),
+                        String.format("%d %d", sx, sy)));
+
+                Point endP = game.countShoot(playerPos, new Point(sx, sy));
+                shoot.add(new Point[] {playerPos, endP});
+                shootTime.add(System.currentTimeMillis());
+            }
+        } else if (shooted) {
+            shooted = false;
+        }
+    }
+
+    private boolean canShoot() {
+        return (prevTime - lastShootTime > SHOOT_TIME) && ! shooted;
     }
 
     private void sendEvent(GameEvent event) {
@@ -97,7 +158,64 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
         drawMap();
         drawPlayer();
 
+        drawMouse();
+
+        updateTime();
+
         Display.update();
+        Display.sync(60);
+    }
+
+    private void drawMouse() {
+        drawer.drawLine(mouseX - View.MOUSE_LENGTH, mouseY - View.MOUSE_LENGTH,
+                mouseX + View.MOUSE_LENGTH, mouseY + View.MOUSE_LENGTH, View.MOUSE_COLOR);
+        drawer.drawLine(mouseX - View.MOUSE_LENGTH, mouseY + View.MOUSE_LENGTH,
+                mouseX + View.MOUSE_LENGTH, mouseY - View.MOUSE_LENGTH, View.MOUSE_COLOR);
+
+        int px = game.getPlayerX();
+        int py = game.getPlayerY();
+
+        int lScreen = px - View.SCREEN_WIDTH/2;
+        int rScreen = lScreen + View.SCREEN_WIDTH;
+        int dScreen = py - View.SCREEN_HEIGHT/2;
+        int uScreen = dScreen + View.SCREEN_HEIGHT;
+
+        int x1;
+        int y1;
+        int x2;
+        int y2;
+
+        Iterator<Point[]> iter = shoot.iterator();
+        Iterator<Long> timeIter = shootTime.iterator();
+        Point[] shoots;
+        long time;
+        while (iter.hasNext() && timeIter.hasNext()) {
+            shoots = iter.next();
+            time = timeIter.next();
+
+            x1 = shoots[0].getX();
+            y1 = shoots[0].getY();
+            x2 = shoots[1].getX();
+            y2 = shoots[1].getY();
+
+            if (lScreen < x1 && x1 < rScreen
+                    || dScreen < y1 && y1 < uScreen
+                    || lScreen < x2 && x2 < rScreen
+                    || dScreen < y2 && y2 < uScreen) {
+//                System.out.printf(" %d:%d --- %d:%d%n", x1, y1, x2, y2);
+
+                drawer.drawLine(View.SCREEN_WIDTH/2 - (px - x1),
+                        View.SCREEN_HEIGHT/2 - (py - y1),
+                        View.SCREEN_WIDTH/2 - (px - x2),
+                        View.SCREEN_HEIGHT/2 - (py - y2),
+                        View.BEAM_COLOR);
+            }
+
+            if (prevTime - time > DRAW_SHOOT_TIME) {
+                iter.remove();
+                timeIter.remove();
+            }
+        }
     }
 
     public void addGameManager(GameManager gmanager) {
@@ -233,7 +351,7 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
         int eyeW = (int)(0.2f * View.TILE_WIDTH);
         int eyeH = (int)(0.2f * View.TILE_HEIGHT);
 
-        if (game.isPlayerWatchingRight()) {
+        if (View.SCREEN_WIDTH/2 + View.TILE_WIDTH/2 <= mouseX) {
             eyeX += (int)(0.70f * View.TILE_WIDTH);
         } else {
             eyeX += (int)(0.25f * View.TILE_WIDTH);

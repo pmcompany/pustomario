@@ -18,6 +18,10 @@ public class View {
     public static final PColor ALIENT_COLOR = PColor.BLUE;
     public static final PColor EYE_COLOR = PColor.BLACK;
     public static final PColor BACK_COLOR = new PColor(0.3f, 0.3f, 0.3f, 0.3f);
+    public static final PColor MOUSE_COLOR = PColor.RED;
+    public static final PColor BEAM_COLOR = PColor.YELLOW;
+
+    public static final int MOUSE_LENGTH = 5;
 
     private int screenStartX;
     private int screenStartY;

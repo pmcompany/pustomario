@@ -36,4 +36,7 @@ public interface DataProvider {
     public int getPlayersNum();
 
     public Player getPlayer();
+
+    public Point countShoot(Point start, Point aim);
+    public Point getPlayerPosition();
 }

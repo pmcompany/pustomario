@@ -7,6 +7,7 @@ public class PColor {
     public static final PColor RED = new PColor(1, 0, 0, 0);
     public static final PColor GREEN = new PColor(0, 1, 0, 0);
     public static final PColor BLUE = new PColor(0, 0, 1, 0);
+    public static final PColor YELLOW = new PColor(1, 1, 0, 0);
     public static final PColor BLACK = new PColor(0, 0, 0, 0);
     public static final PColor WHITE = new PColor(1, 1, 1, 0);
 
