@@ -139,15 +139,21 @@ public class ConcreteGame implements EventHandler, DataProvider, EventServer {
 //            } break;
 
             case RUN_RIGHT: {
-                p.accelerateX(Physics.RUN_SPEED);
+                if (p != null) {
+                    p.accelerateX(Physics.RUN_SPEED);
+                }
             } break;
             case RUN_LEFT: {
-                p.accelerateX(-Physics.RUN_SPEED);
+                if (p != null) {
+                    p.accelerateX(-Physics.RUN_SPEED);
+                }
             } break;
             case JUMP: {
-                if (p.isCanJump()) {
-                    p.accelerateY(Physics.JUMP_SPEED);
-                    p.setCanJump(false);
+                if (p != null) {
+                    if (p.isCanJump()) {
+                        p.accelerateY(Physics.JUMP_SPEED);
+                        p.setCanJump(false);
+                    }
                 }
             } break;
 
