@@ -170,4 +170,21 @@ public class Server implements Runnable, NetClientsController {
             p.setY(y);
         }
     }
+
+    public void disconnectPlayer(NetworkServer serv) {
+        Iterator<String> iter = clientMap.keySet().iterator();
+
+        boolean done = false;
+
+        NetworkServer curServ;
+        String name;
+        while (iter.hasNext() || !done) {
+            name = iter.next();
+            curServ = clientMap.get(name);
+            if (curServ == serv) {
+                clientMap.remove(name);
+                done = true;
+            }
+        }
+    }
 }

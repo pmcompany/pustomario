@@ -6,13 +6,15 @@ import com.github.pmcompany.pustomario.io.PColor;
  * @author dector (dector9@gmail.com)
  */
 public class Player {
+    public static final int START_HP = 100;
+
     private String name;
     private int x;
     private int y;
     private int prevX;
     private int prevY;
 
-    private int hp = 100;
+    private int hp = START_HP;
 
     private float speedX;
     private float speedY;
@@ -130,5 +132,10 @@ public class Player {
 
     public Point getPosition() {
         return new Point(getX(), getY());
+    }
+
+    public int changeHP(int delta) {
+        setHp(getHp() + delta);
+        return getHp();
     }
 }

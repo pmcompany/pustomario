@@ -14,4 +14,6 @@ public interface NetClientsController {
     public String getClientName(NetworkServer server);
 
     public void setClientPos(String name, int x, int y);
+
+    public void disconnectPlayer(NetworkServer serv);
 }

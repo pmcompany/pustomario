@@ -120,6 +120,7 @@ public class ConcreteNetworkServer implements NetworkServer, Connection, EventHa
         if (isConnected()) {
             try {
                 network.close();
+                controller.disconnectPlayer(this);
 
                 connected = false;
             } catch (IOException e) {

@@ -6,10 +6,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static com.github.pmcompany.pustomario.core.VectorDirection.*;
 
@@ -18,9 +15,11 @@ import static com.github.pmcompany.pustomario.core.VectorDirection.*;
  */
 public class ConcreteGame implements EventHandler, DataProvider, EventServer {
     private static final int TRACE_RAY_COEF = 1;
+    private static final int HIT_DECREMENT_HP_VALUE = 10;
 
     private Map map;
     private java.util.Map<String, Player> players;
+    private EventHandler generatedEventsEventHandler;
 
     private String playerName;
     private Player currentPlayer;
@@ -28,6 +27,11 @@ public class ConcreteGame implements EventHandler, DataProvider, EventServer {
     private List<EventHandler> handlers;
 
     private long updateTime;
+
+    private Player hitedPlayer;
+
+    private List<Point> spawnPoints;
+    private Rating rate;
 
     public ConcreteGame(String playerName) {
         this.playerName = playerName;
@@ -37,9 +41,39 @@ public class ConcreteGame implements EventHandler, DataProvider, EventServer {
     }
 
     public void initGame() {
+        spawnPoints = new LinkedList<Point>();
+
         loadMap();
 
+        initPlayers();
+
         updateTime = System.currentTimeMillis();
+    }
+
+    private void initPlayers() {
+        rate = new Rating();
+
+        if (players.isEmpty()) {
+            Player p = new Player(0, 0);
+            p.setName(playerName);
+
+            players.put(playerName, p);
+        }
+        
+        for (Player p : players.values()) {
+            spawn(p);
+            rate.addPlayer(p);
+        }
+    }
+
+    private void spawn(Player p) {
+        System.out.println("Respawning player " + p.getName());
+
+        Random rnd = new Random();
+        Point spawnPoint = spawnPoints.get(rnd.nextInt(spawnPoints.size()));
+        p.setHp(Player.START_HP);
+        p.setX((spawnPoint.getX()-1) * View.TILE_WIDTH + 1);
+        p.setY((spawnPoint.getY()-1) * View.TILE_HEIGHT + 1);
     }
 
     private void loadMap() {
@@ -61,10 +95,11 @@ public class ConcreteGame implements EventHandler, DataProvider, EventServer {
                     if (tile == '#') {
                         map.setAt(i, j, levelLine.charAt(i-1));
                     } else if (tile == '@') {
-                        if (playerName != null) {
-                            currentPlayer = new Player((i-1) * View.TILE_WIDTH + 1,
-                                    (j-1) * View.TILE_HEIGHT + 1);
-                        }
+                        spawnPoints.add(new Point(i, j));
+//                        if (playerName != null) {
+//                            currentPlayer = new Player((i-1) * View.TILE_WIDTH + 1,
+//                                    (j-1) * View.TILE_HEIGHT + 1);
+//                        }
                     }
                 }
             }
@@ -122,9 +157,51 @@ public class ConcreteGame implements EventHandler, DataProvider, EventServer {
                 int sx = Integer.parseInt(pos[0]);
                 int sy = Integer.parseInt(pos[1]);
 
-                Point shootPoint = countShoot(currentPlayer.getPosition(), new Point(sx, sy));
+                countShoot(currentPlayer.getPosition(), new Point(sx, sy));
 
-                // Check player near end shoot----------------
+                if (hitedPlayer != null) {
+                    Event event = new GameEvent(EventType.INCREMENT_HP, e.getSender(),
+                            hitedPlayer.getName() + " -" + HIT_DECREMENT_HP_VALUE);
+
+                    for (EventHandler h : handlers) {
+                        h.handleEvent(event);
+                    }
+
+                    hitedPlayer = null;
+                    handleEvent(event);
+                }
+
+            } break;
+
+            case INCREMENT_HP: {
+                String[] values = e.getStringValue().split(" ");
+                int leftHP = players.get(values[0]).changeHP(Integer.parseInt(values[1]));
+
+                if (leftHP <= 0) {
+                    GameEvent event = new GameEvent(EventType.KILLED, e.getSender(), values[0]);
+                    for (EventHandler h : handlers) {
+                        h.handleEvent(event);
+                    }
+                    handleEvent(event);
+                }
+            } break;
+
+            case KILLED: {
+                System.out.printf("%s: %s killed %s%n", playerName, e.getSender(), e.getStringValue());
+                rate.incScore(players.get(e.getSender()), 1);
+                rate.incScore(players.get(e.getStringValue()), -1);
+
+                GameEvent event = new GameEvent(EventType.REBORN,
+                        e.getSender(), e.getStringValue());
+                for (EventHandler h : handlers) {
+                    h.handleEvent(event);
+                }
+
+                handleEvent(event);
+            } break;
+
+            case REBORN: {
+                spawn(players.get(e.getStringValue()));
             } break;
 
             case JOIN_NEW_PLAYER: {
@@ -136,6 +213,7 @@ public class ConcreteGame implements EventHandler, DataProvider, EventServer {
                 newPlayer.setName(e.getSender());
 
                 players.put(newPlayer.getName(), newPlayer);
+                rate.addPlayer(newPlayer);
             } break;
 
             case MOVE_PLAYER: {
@@ -485,6 +563,10 @@ public class ConcreteGame implements EventHandler, DataProvider, EventServer {
     }
 
     public Point countShoot(Point start, Point aim) {
+        return countShoot(start, aim, true);
+    }
+
+    public Point countShoot(Point start, Point aim, boolean fillShooted) {
         boolean done = false;
 
         double cx = start.getX();
@@ -511,6 +593,17 @@ public class ConcreteGame implements EventHandler, DataProvider, EventServer {
                 prevTile = currTile;
                 currTile = countTileByAbs((int)cx, (int)cy);
 
+                for (Player p : players.values()) {
+                    if (p != currentPlayer
+                            && p.getX() <= cx && cx <= p.getX() + View.TILE_WIDTH/2
+                            && p.getY() <= cy && cy <= p.getY() + View.TILE_HEIGHT/2) {
+                        done = true;
+                        if (fillShooted) {
+                            hitedPlayer = p;
+                        }
+                    }
+                }
+
                 if (! currTile.equals(prevTile)) {
                     if (getTileAt(currTile.getX(), currTile.getY()) == '#') {
                         done = true;
@@ -526,5 +619,27 @@ public class ConcreteGame implements EventHandler, DataProvider, EventServer {
 
     public Point getPlayerPosition() {
         return currentPlayer.getPosition();
+    }
+
+    public EventHandler getGeneratedEventsEventHandler() {
+        return generatedEventsEventHandler;
+    }
+
+    public void setGeneratedEventsEventHandler(EventHandler generatedEventsEventHandler) {
+        this.generatedEventsEventHandler = generatedEventsEventHandler;
+    }
+
+    public String getWinnerName() {
+        Player p = rate.getWinner();
+
+        if (p != null) {
+            return p.getName();
+        } else {
+            return "N/a";
+        }
+    }
+
+    public int getWinnerScore() {
+        return rate.getScore(rate.getWinner());
     }
 }

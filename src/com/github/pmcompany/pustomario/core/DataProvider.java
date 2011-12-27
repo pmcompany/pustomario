@@ -38,5 +38,9 @@ public interface DataProvider {
     public Player getPlayer();
 
     public Point countShoot(Point start, Point aim);
+    public Point countShoot(Point start, Point aim, boolean fillShooted);
     public Point getPlayerPosition();
+
+    public String getWinnerName();
+    public int getWinnerScore();
 }

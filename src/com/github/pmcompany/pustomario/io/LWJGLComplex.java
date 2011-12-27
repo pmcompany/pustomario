@@ -18,8 +18,8 @@ import java.util.List;
 /**
  * @author dector (dector9@gmail.com)
  */
-public class LWJGLComplex implements EventServer, InputServer, OutputHandler, GameManagerUser {
-    private static final int SHOOT_TIME = 100;
+public class LWJGLComplex implements EventServer, InputServer, OutputHandler, GameManagerUser, EventHandler {
+    private static final int SHOOT_TIME = 200;
     private static final int DRAW_SHOOT_TIME = 100;
 
     private List<EventHandler> handlers;
@@ -120,7 +120,7 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
 //        System.out.printf("Mouse clicked %d:%d%n", mouseX, mouseY);
         if (Mouse.isButtonDown(0)) {
             if (canShoot()) {
-                lastShootTime = prevTime;
+                lastShootTime = System.currentTimeMillis();
                 shooted = true;
 
                 Point playerPos = game.getPlayerPosition();
@@ -135,7 +135,7 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
 
                 Point endP = game.countShoot(playerPos, new Point(sx, sy));
                 shoot.add(new Point[] {playerPos, endP});
-                shootTime.add(System.currentTimeMillis());
+                shootTime.add(lastShootTime);
             }
         } else if (shooted) {
             shooted = false;
@@ -422,6 +422,13 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
         // DEBUG END
 
         drawer.fillRect(eyeX-1, eyeY-1, eyeW, eyeH, View.EYE_COLOR);
+
+        drawer.drawString(10, View.SCREEN_HEIGHT - 30,
+                String.format("HP %d", game.getPlayer().getHp()), textFont, Color.red);
+        String winnerString = String.format("Winner %s (%d)", game.getWinnerName(),
+                game.getWinnerScore());
+        drawer.drawString((View.SCREEN_WIDTH - textFont.getWidth(winnerString)) / 2, 10,
+                winnerString, textFont, Color.red);
     }
 
     public void addEventHandler(EventHandler handler) {
@@ -432,5 +439,28 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
 
     public void removeEventHandler(EventHandler handler) {
         handlers.remove(handler);
+    }
+
+    public void handleEvent(Event e) {
+        switch (e.getType()) {
+            case SHOOT: {
+                String[] pos = e.getStringValue().split(" ");
+
+                int sx = Integer.parseInt(pos[0]);
+                int sy = Integer.parseInt(pos[1]);
+
+                int x = game.getPlayerX(e.getSender());
+                int y = game.getPlayerY(e.getSender());
+
+                Point playerPoint = new Point(x, y);
+
+                Point resultPoint = game.countShoot(playerPoint, new Point(sx, sy), false);
+
+                System.out.printf("Adding shoot: %s -- %s%n", playerPoint, resultPoint);
+
+                shoot.add(new Point[] {playerPoint, resultPoint});
+                shootTime.add(lastShootTime);
+            } break;
+        }
     }
 }

@@ -8,7 +8,7 @@ public enum EventType {
 
     RUN_LEFT, RUN_RIGHT, JUMP, SHOOT,
 
-    MOVE_PLAYER,
+    MOVE_PLAYER, INCREMENT_HP, KILLED, REBORN,
 
     // Service events
     ADD_NEW_PLAYER, JOIN_NEW_PLAYER, SPECTATE_PLAYER

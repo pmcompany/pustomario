@@ -45,6 +45,7 @@ public class Client implements Runnable, GameManager, OutputServer {
 
     public void run() {
         game.initGame();
+
         while (! (turnOff || lwjgl.isCloseRequested())) {
             lwjgl.checkInput();
             game.preUpdate();
@@ -99,6 +100,7 @@ public class Client implements Runnable, GameManager, OutputServer {
 
 //            lwjgl.addEventHandler(clientNetwork.getNetworkSender());
             clientNetwork.getNetworkReceiver().addEventHandler(game);
+            clientNetwork.getNetworkReceiver().addEventHandler(lwjgl);
         }
     }
 
