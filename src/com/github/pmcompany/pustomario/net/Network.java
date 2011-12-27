@@ -4,6 +4,8 @@ import com.github.pmcompany.pustomario.core.Event;
 import com.github.pmcompany.pustomario.core.EventHandler;
 import com.github.pmcompany.pustomario.core.EventServer;
 
+import javax.swing.*;
+
 /**
  * @author dector (dector9@gmail.com)
  */
@@ -29,5 +31,18 @@ public class Network implements EventHandler, EventServer {
 
     public void removeEventHandler(EventHandler handler) {
         remoteHandler = null;
+    }
+
+    public static void inputServerURL() {
+        String serverStr = JOptionPane.showInputDialog("Input server URL", HOST + ":" + PORT);
+
+        if (serverStr != null) {
+            String[] val = serverStr.split(":");
+
+            if (val.length > 1) {
+                HOST = val[0];
+                PORT = Integer.parseInt(val[1]);
+            }
+        }
     }
 }

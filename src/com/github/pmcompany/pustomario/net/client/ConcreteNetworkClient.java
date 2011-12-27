@@ -160,4 +160,12 @@ public class ConcreteNetworkClient implements NetworkClient, EventHandler {
             } break;
         }
     }
+
+    public String getHost() {
+        return host;
+    }
+
+    public int getPort() {
+        return port;
+    }
 }

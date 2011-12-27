@@ -158,6 +158,15 @@ public class Server implements Runnable, NetClientsController {
     }
 
     public static void main(String[] args) {
+        if (args.length > 0) {
+            String[] serverStr = args[0].split(":");
+
+            if (serverStr.length > 1) {
+                Network.HOST = serverStr[0];
+                Network.PORT = Integer.parseInt(serverStr[1]);
+            }
+        }
+
         Server s = new Server();
         s.run();
     }

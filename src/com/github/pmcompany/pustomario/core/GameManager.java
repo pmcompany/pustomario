@@ -20,4 +20,7 @@ public interface GameManager {
 
     public EventServer getMainEventServer();
     public EventHandler getMainEventHandler();
+
+    public String getServerName();
+    public int getServerPort();
 }

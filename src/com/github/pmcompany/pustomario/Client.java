@@ -128,7 +128,8 @@ public class Client implements Runnable, GameManager, OutputServer {
     }
 
     private String enterName() {
-        return JOptionPane.showInputDialog("Enter player's name");
+        return JOptionPane.showInputDialog("Enter player's name",
+                (game != null && game.getPlayerName() != null) ? game.getPlayerName() : "");
     }
 
     public String getName() {
@@ -137,7 +138,7 @@ public class Client implements Runnable, GameManager, OutputServer {
 
     public void changeName() {
         String name = enterName();
-        if (! name.isEmpty()) {
+        if (name != null && ! name.isEmpty()) {
             game.setPlayerName(name);
         }
     }
@@ -152,5 +153,25 @@ public class Client implements Runnable, GameManager, OutputServer {
 
     public void addNewPlayer(String name, int x, int y) {
         game.addPlayer(name, x, y);
+    }
+
+    public String getServerName() {
+        String name;
+
+        if (clientNetwork != null && clientNetwork.isConnected()) {
+            name = clientNetwork.getHost();
+        } else {
+            name = "[Not connected]";
+        }
+
+        return name;
+    }
+
+    public int getServerPort() {
+        if (clientNetwork != null) {
+            return clientNetwork.getPort();
+        } else {
+            return 0;
+        }
     }
 }

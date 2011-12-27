@@ -17,4 +17,7 @@ public interface NetworkClient extends Connection {
     public void disconnectServer();
     public NetworkReceiver getNetworkReceiver();
     public NetworkSender getNetworkSender();
+
+    public String getHost();
+    public int getPort();
 }

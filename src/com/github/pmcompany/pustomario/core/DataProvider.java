@@ -43,4 +43,6 @@ public interface DataProvider {
 
     public String getWinnerName();
     public int getWinnerScore();
+
+    public int getScore(Player p);
 }

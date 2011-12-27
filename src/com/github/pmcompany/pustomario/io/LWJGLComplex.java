@@ -1,6 +1,7 @@
 package com.github.pmcompany.pustomario.io;
 
 import com.github.pmcompany.pustomario.core.*;
+import com.github.pmcompany.pustomario.net.Network;
 import org.lwjgl.LWJGLException;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.input.Mouse;
@@ -41,6 +42,9 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
     private List<Point[]> shoot;
     private List<Long> shootTime;
 
+    private boolean showStats;
+    private boolean showHelp;
+
     // DEBUG BEGIN
     private Font textFont;
     // DEBUG END
@@ -56,6 +60,8 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
             gmanager.turnOffGame();
         }
 
+        Mouse.setGrabbed(true);
+
         drawer = new GLDrawer(screenWidth, screenHeight);
         drawer.setClearColor(View.BACK_COLOR);
         view = new View();
@@ -64,7 +70,7 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
         handlers = new LinkedList<EventHandler>();
 
         // DEBUG BEGIN
-        java.awt.Font font = new java.awt.Font(java.awt.Font.SERIF, java.awt.Font.PLAIN, 14);
+        java.awt.Font font = new java.awt.Font(java.awt.Font.SANS_SERIF, java.awt.Font.PLAIN, 17);
         textFont = new TrueTypeFont(font, false);
         // DEBUG END
 
@@ -101,7 +107,12 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
         if (Keyboard.next()) {
             if (Keyboard.getEventKeyState()) {
                 switch (Keyboard.getEventKey()) {
+                    case Keyboard.KEY_F1: {
+                        showHelp = !showHelp;
+                    }; break;
                     case Keyboard.KEY_F2: gmanager.switchDebugMode(); break;
+                    case Keyboard.KEY_F3: gmanager.changeName(); break;
+                    case Keyboard.KEY_F4: Network.inputServerURL(); break;
                     case Keyboard.KEY_F5: gmanager.connectServer(); break;
                     case Keyboard.KEY_F6: gmanager.joinGame(); break;
                     case Keyboard.KEY_F8: gmanager.spectateGame(); break;
@@ -112,6 +123,16 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
 
         if (Keyboard.isKeyDown(Keyboard.KEY_ESCAPE)) {
             gmanager.turnOffGame();
+        }
+
+        if (Keyboard.isKeyDown(Keyboard.KEY_TAB)) {
+            if (! showStats) {
+                showStats = true;
+            }
+        } else {
+            if (showStats) {
+                showStats = false;
+            }
         }
 
         mouseX = Mouse.getX();
@@ -142,6 +163,29 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
         }
     }
 
+    private void drawHelp() {
+        int statsWidth = 400;
+        int statsHeight = 300;
+
+        int statsX = (View.SCREEN_WIDTH - statsWidth) / 2;
+        int statsY = (View.SCREEN_HEIGHT - statsHeight) / 2;
+
+        int padding = 10;
+
+        drawer.fillRect(statsX, statsY,
+                statsWidth, statsHeight, PColor.BLACK);
+
+        String[] lines = new String[] {"A - move left", "D - move right", "W - jump",
+                "<Left mouse button> - shoot", "F1 - show this help",
+                "F2 - Switch debug mode", "F3 - Change name", "F4 - Enter server URL",
+                "F5 - Connect to server", "F6 - Join to server",
+                "F9 - Disconnect from server", "<TAB> - Show stats"};
+        for (int i = 1; i <= lines.length; i++) {
+            drawer.drawString(statsX + padding, statsY + i*2*padding, lines[i-1], textFont, Color.white);
+
+        }
+    }
+
     private boolean canShoot() {
         return (prevTime - lastShootTime > SHOOT_TIME) && ! shooted;
     }
@@ -158,12 +202,54 @@ public class LWJGLComplex implements EventServer, InputServer, OutputHandler, Ga
         drawMap();
         drawPlayer();
 
+        if (showStats) {
+            drawStats();
+        }
+
+        if (showHelp) {
+            drawHelp();
+        }
+
         drawMouse();
 
         updateTime();
 
         Display.update();
         Display.sync(60);
+    }
+
+    private void drawStats() {
+        int statsWidth = 400;
+        int statsHeight = 300;
+
+        int statsX = (View.SCREEN_WIDTH - statsWidth) / 2;
+        int statsY = (View.SCREEN_HEIGHT - statsHeight) / 2;
+
+        int padding = 10;
+
+        drawer.fillRect(statsX, statsY,
+                statsWidth, statsHeight, PColor.BLACK);
+
+        drawer.drawString(statsX + padding, statsY + padding,
+                String.format("Server: %s:%d", gmanager.getServerName(), gmanager.getServerPort()), textFont, Color.white);
+
+        Iterator<Player> iter = game.getPlayersIterator();
+        int i = 2;
+        Player p;
+        String playerStr;
+        while (iter.hasNext()) {
+            p = iter.next();
+
+            playerStr = String.format("Player %d: `%s` (%d)", i-1, p.getName(), game.getScore(p));
+
+            drawer.drawString(statsX + padding, statsY + i*2*padding, playerStr, textFont, Color.white);
+            if (game.getWinnerName().equals(p.getName())) {
+                drawer.drawString(statsX + padding + textFont.getWidth(playerStr),
+                        statsY + i*2*padding, "*", textFont, Color.yellow);
+            }
+
+            i++;
+        }
     }
 
     private void drawMouse() {

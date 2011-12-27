@@ -642,4 +642,8 @@ public class ConcreteGame implements EventHandler, DataProvider, EventServer {
     public int getWinnerScore() {
         return rate.getScore(rate.getWinner());
     }
+
+    public int getScore(Player p) {
+        return rate.getScore(p);
+    }
 }
